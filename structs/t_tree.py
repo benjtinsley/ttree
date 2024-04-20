@@ -101,9 +101,8 @@ class TTree:
         @param: new_node: The new node to this parent we will be adding as the left child
         @param: root_node: Root node to start the search from.
         """
-        # the root node has no children
-        if not root_node.left_child:
-            root_node.left_child = new_node
+        # the new node was already added to the root node's left when added to the tree
+        if root_node.left_child == new_node:
             return
 
         # pick up the left child and set it to the sent_node
