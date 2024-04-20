@@ -109,7 +109,7 @@ class TalentNode:
         else:    
             self._insert_balanced_task_node(new_task_node, self.task_head)
         return
-    
+
     def _recall_task_from_tree(self, task_node, task_name, access_time) -> bool:
         """
         Recalls a task from the Task Node tree.
@@ -242,3 +242,19 @@ class TalentNode:
         node1.last_access_time, node2.last_access_time = node2.last_access_time, node1.last_access_time
         node1.is_burnt, node2.is_burnt = node2.is_burnt, node1.is_burnt
 
+    # Internal functions
+    def _find_task_node(self, task_name, task_node) -> TaskNode:
+        """
+        Finds a Task Node in the tree. Used in testing. Maybe useful for debugging.
+        @param: task_name: Name of the task to find.
+        @param: task_node: Node to start the search
+        @return: Task Node if found, None otherwise.
+        """
+        if task_node.task_name == task_name:
+            return task_node
+        else:
+            if task_node.left_child:
+                return self._find_task_node(task_name, task_node.left_child)
+            if task_node.right_child:
+                return self._find_task_node(task_name, task_node.right_child)
+        return None
