@@ -29,15 +29,20 @@ class TalentNode:
         # if the recent task map is full, convert the tasks to nodes
         if len(talent_node.recent_task_map) >=  talent_node.max_tasks:
             # but first, check for burnout
-            step = 1
             total_in_order = 0
-            previous_time = list(talent_node.recent_task_map.keys())[0]
-            for creation_time in range(1, len(talent_node.recent_task_map.keys())):
+            # use step to check for sequential tasks
+            step = 1
+            # get the keys in order
+            keys = list(talent_node.recent_task_map.keys())
+            # get the first key
+            previous_time = keys[0]
+            # check the rest of the keys
+            for this_time in keys[1:]: 
                 # if these tasks were added in sequence, we need to know
-                if creation_time - previous_time == step:
+                if this_time - previous_time == step:
                     total_in_order += 1
 
-                previous_time = creation_time
+                previous_time = this_time
             
             if total_in_order >= self.burnout_limit:
                 # if more tasks were added in sequence than allowed, 
@@ -172,6 +177,7 @@ class TalentNode:
         # we only search down the right side of the tree if we are burnt out
         if not current_node.right_child:
             current_node.right_child = task_node
+            task_node.parent = current_node
             return
         
         # if there are children, we need to go deeper
@@ -186,22 +192,38 @@ class TalentNode:
         # if there is no head, make this the head
         if self.task_head is None:
             self.task_head = task_node
-            return
+            return True
+
+        # if the head is burnt out, we need to make this the head
+        if self.task_head.is_burnt:
+            # this check shouldn't be necessary, but just a good reminder
+            # that balanced tree insertions are only for non-burnt out nodes
+            if not task_node.is_burnt:
+                # make this the head
+                self.task_head.parent = task_node
+                task_node.right_child = self.task_head
+                self.task_head = task_node
+                return True
         
         # if there is no left child, make this the left child
-        if not root_node.left_child:
+        if root_node.left_child is None:
             root_node.left_child = task_node
-            return
+            task_node.parent = root_node
+            return True
         
         # if there is no right child, make this the right child
-        if not root_node.right_child:
+        if root_node.right_child is None:
             root_node.right_child = task_node
-            return
+            task_node.parent = root_node
+            return True
 
         # if there are children, we need to go deeper
         left_position = self.__insert_balanced_task_node(task_node, root_node.left_child)
-        right_position = self.__insert_balanced_task_node(task_node, root_node.right_child)
-
+        
+        # we don't want to go down the right side if we find a burnt out node
+        if not root_node.right_child.is_burnt:
+            right_position = self.__insert_balanced_task_node(task_node, root_node.right_child)
+        
         return left_position or right_position
 
 

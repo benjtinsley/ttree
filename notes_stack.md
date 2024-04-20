@@ -1,5 +1,6 @@
 # Notes, next steps, etc
 ## Current task
+- [x] test burnout toggle off -> __insert_balanced_task_node is getting max recursion depth
 - [x] test burnout - burnout never being set to true -> recent_task_map not storing all values -> ~time not being updated~ lost_talents cant be found
 - [x] build burnout breakout
 - [x] set burnout
