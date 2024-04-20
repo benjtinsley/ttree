@@ -29,5 +29,15 @@ class TestTalentNode(unittest.TestCase):
         other_task_node = node._find_task_node(other_tasks[0], node.task_head)
         self.assertIs(other_task_node.is_burnt, False, "The found talent node should no longer be burnt out when spacing out the tasks added.")    
 
+    def test_relearn(self):
+        tree = TTree()
+        tasks = ['1', '2', '3', '4', '5', '6', '7']
+        talents = ["TalentA", "TalentB", "TalentB", "TalentB", "TalentB", "TalentB",  "TalentA"]
+        for task in tasks:
+            talent = talents.pop()
+            tree.add_task(task, talent)
+        node = tree._find_talent_node("TalentA", tree.head)
+        self.assertEqual(node.recent_task_map, {}, "The Talent Node should have an empty recent task map waiting too long between tasks (most recent add time - last add time is >= 2 x the amount of talent nodes).")
+
 if __name__ == '__main__':
     unittest.main()

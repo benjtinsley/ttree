@@ -21,7 +21,8 @@ class TTree:
         # grab the starting rank of the talent node for comparison later
         starting_rank = talent_node.rank
         current_time = self.capture_flowing_time()
-        talent_node.store_task(talent_node, task_name, current_time)
+        total_nodes = self._count_total_talents(self.head)
+        talent_node.store_task(talent_node, task_name, current_time, total_nodes)
         
         # add this node to the left most position at this depth
         left_most_uncle = self.__get_left_most_talent_node_at_rank(self.head, talent_node.parent.rank)
@@ -70,6 +71,7 @@ class TTree:
             self.__update_time() 
         return current_time
     
+
     def die(self) -> None:
         """
         Destroys T Tree.
@@ -200,6 +202,27 @@ class TTree:
             return self.__get_left_most_talent_node_at_rank(talent_node.left_child, rank)
 
     # Internal functions
+    def _count_total_talents(self, root_node, count=0) -> int:
+        """
+        Counts the total number of talents in the T Tree.
+        @param: count: Total number of talents.
+        @return: Total number of talents.
+        """
+        # base case: if we are at a leaf node, return the count
+        if not root_node:
+            return 0
+        
+        # if it's the head node, do not count it
+        if root_node is self.head:
+            left_count = self._count_total_talents(root_node.left_child)
+            right_count = self._count_total_talents(root_node.right_child)
+            return left_count + right_count
+        else:
+            # otherwise, count this node and recurse down the tree
+            left_count = self._count_total_talents(root_node.left_child)
+            right_count = self._count_total_talents(root_node.right_child)
+            return 1 + left_count + right_count
+
     def _find_talent_node(self, talent_name: str, root_node: TalentNode) -> TalentNode:
         """
         Finds a Talent Node in the T Tree.

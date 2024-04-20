@@ -16,15 +16,23 @@ class TalentNode:
         self.max_tasks = max_tasks # Start with a low max tasks limit, but will grow
 
     # Public functions
-    def store_task(self, talent_node, task_name, current_time) -> None:
+    def store_task(self, talent_node, task_name, current_time, total_nodes) -> None:
         """
         Stores a task in the Talent Node.
         @param: task_name: Name of the task to store.
         @param: current_time: Time when the task was stored.
         """
+        # if it's been too long since the last task, we need to relearn
+        if len(talent_node.recent_task_map) > 0:
+            last_time = list(talent_node.recent_task_map.keys())[-1]
+            # if the time between the last task and this task is greater than the total nodes * 2
+            if current_time - last_time >= total_nodes * 2:
+                # we've forgotten everything, start over
+                talent_node.recent_task_map.clear()
+                return
+
         talent_node.recent_task_map[current_time] = task_name
         talent_node.last_access = current_time
-        # TODO: need to check for relearn, ie it's been too long since current_time and last current_time
     
         # if the recent task map is full, convert the tasks to nodes
         if len(talent_node.recent_task_map) >=  talent_node.max_tasks:
