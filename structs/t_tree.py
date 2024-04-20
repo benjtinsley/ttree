@@ -11,22 +11,60 @@ class TTree:
         self.head = TalentNode(name=None, rank=math.inf) 
     
     # Public functions
-    def add_task(self, task_name, talent_name):
+    def add_task(self, task_name: str, talent_name: str=None) -> None:
+        # if not task name, raise error, we must have a task
+        if not task_name:
+            raise ValueError("Task name must be provided.")
+        
         talent_node = self._find_talent_node(talent_name, self.head)
         if not talent_node:
             talent_node = self._add_talent_node(talent_name, self.head)
+        # grab the starting rank of the talent node for comparison later
+        starting_rank = talent_node.rank
         talent_node.store_task(task_name, self.time)
-        self._update_time()
+        self.current_time()
+        
+        # add this node to the left most position at this depth
+        left_most_uncle = self._get_left_most_at_rank(talent_node.parent.rank)
+        self._shift_talent_nodes_right(talent_node, left_most_uncle)
 
-    def access_task(self, task_name, talent_name=None):
-        if not talent_name:
-            # we will have to search the entire t tree for this task, if it exists
-            pass
+        # the talent node's rank may have been updated, in store_task
+        # if so, a promotion is in order
+        if talent_node.rank > starting_rank:
+            self._promote_talent_node()
+        
+        return
+
+    def access_task(self, task_name, talent_name) -> None:
+        """
+        Accesses a task in the T Tree. The side-effect is shifting 
+        this Talent Node to the left-most position at its depth.
+        @param: task_name: Name of the task to access.
+        @param: talent_name: Name of the talent to access.
+        """
         talent_node = self._find_talent_node(talent_name, self.head)
-        talent_node.recall_task(task_name, self.time)
-        # TODO: move this node to the left most position at this depth
-        self._update_time()
+        # note that we look up the task and update the time here
+        # this means if this task is not found, it burns time for us
+        task_found = talent_node.recall_task_from_map(task_name, self.capture_flowing_time())
+        
+        if task_found:
+            # TODO: shift this node to left of the tree at this depth
+            # left_most_uncle = self._get_left_most_at_rank(talent_node.parent.rank)
+            # self._shift_talent_nodes_right(talent_node, left_most_uncle)
+            pass
 
+    
+    def capture_flowing_time(self, is_flowing = True) -> int:
+        """
+        Gets the current time of the T Tree then increments if time is expected to flow.
+        @param: is_flowing: Boolean to determine if time should flow.
+        @return: Current time.
+        """
+        current_time = self.time
+        if is_flowing:
+            self._update_time() 
+        return current_time
+    
     def die(self) -> None:
         """
         Destroys T Tree.
@@ -79,6 +117,10 @@ class TTree:
         root_node.right_child = sent_node
         # set the new_node as the left child of the sent_node
         sent_node = temp_node
+
+        # now set the parents on the set nodes
+        root_node.left_child.parent = root_node
+        root_node.right_child.parent = root_node
     
         # if somewhere along the way we picked up a None node, 
         # we should stop shifting
