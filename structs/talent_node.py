@@ -98,7 +98,7 @@ class TalentNode:
             # if the task is burnt out, we need to reset it
             task_node.is_burnt = False
             self._update_task_node_access_time(task_node, access_time)
-            task_node._promote_task_node_to_head()
+            self._promote_task_node_to_head(task_node)
             task_node._heapify()
             return True
         else:
@@ -123,14 +123,15 @@ class TalentNode:
         Promotes a Task Node up the tree.
         This allows us to favor the most recently accessed tasks
         but also fix unbalanced trees, one task at a time.
+        @param: task_node: Task Node to promote.
         """
         # if this node has no parent, we have reached the top of the tree
-        if not self.parent:
+        if not task_node.parent:
             return
         else:
-            self._swap_node_content(self.parent)
+            self._swap_node_content(task_node, task_node.parent)
         
-        return self._promote_task_node_to_head(self.parent)
+        return self._promote_task_node_to_head(task_node.parent)
 
     def _insert_unbalanced_task_node(self, task_node, current_node) -> None:
         """
@@ -139,8 +140,8 @@ class TalentNode:
         @param: current_node: Current node to check for children.
         """
         # if there is no head, make this the head
-        if TalentNode.task_head is None:
-            TalentNode.task_head = task_node
+        if self.task_head is None:
+            self.task_head = task_node
             return
         
         # we only search down the right side of the tree if we are burnt out
