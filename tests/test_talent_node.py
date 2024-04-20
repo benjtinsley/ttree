@@ -16,8 +16,8 @@ class TestTalentNode(unittest.TestCase):
         tasks = ["Some long task", "Some short task", "Some medium task", "Workbook", "Explaining it to someone else", "Trying it again"]
         for task in tasks:
             tree.add_task(task, "TalentA")
-        tree.access_task("Some long task", "TalentA")
-        self.assertIs(tree.head.is_burnout, True, "The most recent talent node should be burnt out by adding too many tasks without a break to a single talent.")
+        node = tree._find_talent_node("TalentA", tree.head)
+        self.assertIs(node.task_head.is_burnt, True, "The most recent talent node should be burnt out by adding too many tasks without a break to a single talent.")
 
 if __name__ == '__main__':
     unittest.main()

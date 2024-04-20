@@ -1,10 +1,11 @@
 # Notes, next steps, etc
 ## Current task
-- [ ] test burnout - burnout never being set to true -> recent_task_map not storing all values -> ~time not being updated~ lost_talents cant be found
+- [x] test burnout - burnout never being set to true -> recent_task_map not storing all values -> ~time not being updated~ lost_talents cant be found
 - [x] build burnout breakout
 - [x] set burnout
 
 ## Running things to do
+- [ ] _convert_tasks_to_nodes: 3rd party function to handle rank increase & promotion
 - [ ] talent node shifting has the tendency to duplicate nodes
 - [ ] Promote talent nodes based on rank & move cut off nodes to lost_memory
 - [x] How mastery (if built) affects burnout? (see below [Random thoughts](#random-thoughts) - burnout can't happen in that talent node)

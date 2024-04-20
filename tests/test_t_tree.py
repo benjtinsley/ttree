@@ -16,7 +16,7 @@ class TestTTree(unittest.TestCase):
         self.assertEqual(tree.head.right_child.name, "TalentB", "The right child's name should be 'TalentB'.")
         self.assertEqual(tree.head.left_child.name, "TalentA", "The left child's name should be 'TalentA'.")
 
-    def test_add_three_talents(self):
+    def test_add_three_talents_with_losses(self):
         tree = TTree()
         tree.add_task("Some long task", "TalentB")
         tree.add_task("Some short task", "TalentA")

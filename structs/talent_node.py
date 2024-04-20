@@ -29,14 +29,19 @@ class TalentNode:
         # if the recent task map is full, convert the tasks to nodes
         if len(talent_node.recent_task_map) >=  talent_node.max_tasks:
             # but first, check for burnout
-            greatest_time_difference = 1
+            step = 1
+            total_in_order = 0
             previous_time = list(talent_node.recent_task_map.keys())[0]
             for creation_time in range(1, len(talent_node.recent_task_map.keys())):
-                if creation_time - previous_time > greatest_time_difference:
-                    greatest_time_difference = creation_time - previous_time
+                # if these tasks were added in sequence, we need to know
+                if creation_time - previous_time == step:
+                    total_in_order += 1
+
+                previous_time = creation_time
             
-            if greatest_time_difference <= self.burnout_limit:
-                # if all the tasks were added in sequence, this talent node is burnt out
+            if total_in_order >= self.burnout_limit:
+                # if more tasks were added in sequence than allowed, 
+                # this talent node is burnt out
                 talent_node.is_burnout = True
             else:
                 # variety is the spice of life
@@ -81,15 +86,18 @@ class TalentNode:
         # clear the recent task map now that they are converted to nodes
         self.recent_task_map.clear()
 
-        # promote this node if it's not burnt out
+        # increase the features if it's not burnt out
         if not self.is_burnout:
             # update the rank and the max_tasks, we've learned something! 
             # this will make it easier to learn more
-            self.rank += 1
             self.max_tasks += 1
             # every other time we learn something, we increase the burnout limit
             if self.max_tasks % 2 != 0:
                 self.burnout_limit += 1
+        
+        # update the rank of this node
+        self.rank += 1
+        # TODO: function to handle rank increase & promotion?
 
     def _add_task_node(self, new_task_node) -> None:
         """
