@@ -55,7 +55,6 @@ class TalentNode:
             return self._recall_task_from_tree(self.task_head, task_name, access_time)
         
     def _convert_tasks_to_nodes(self):
-        print(f"Converting tasks to Task Nodes for Talent Node '{self.name}'.")
         # convert the recent tasks to task nodes
         for creation_time, task in self.recent_task_map.items():
             task_node = TaskNode(task, creation_time, self.is_burnout)
