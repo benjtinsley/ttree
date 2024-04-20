@@ -1,7 +1,7 @@
 import unittest
 from structs import TTree
 
-class TestTalenNode(unittest.TestCase):
+class TestTalentNode(unittest.TestCase):
     def test_check_talent_node_exists(self):
         tree = TTree()
         tasks = ["Some long task", "Some short task", "Some medium task", "Workbook", "Explaining it to someone else", "Trying it again"]

@@ -11,21 +11,20 @@ class TTree:
         self.head = TalentNode(name=None, rank=math.inf) 
     
     # Public functions
-    def add_task(self, task_name: str, talent_name: str=None) -> None:
-        # if not task name, raise error, we must have a task
-        if not task_name:
-            raise ValueError("Task name must be provided.")
+    def add_task(self, task_name: str, talent_name: str) -> None:
         
         talent_node = self._find_talent_node(talent_name, self.head)
+
         if not talent_node:
             talent_node = self._add_talent_node(talent_name, self.head)
+
         # grab the starting rank of the talent node for comparison later
         starting_rank = talent_node.rank
-        talent_node.store_task(task_name, self.time)
-        self.current_time()
+        current_time = self.capture_flowing_time()
+        talent_node.store_task(talent_node, task_name, current_time)
         
         # add this node to the left most position at this depth
-        left_most_uncle = self._get_left_most_at_rank(talent_node.parent.rank)
+        left_most_uncle = self._get_left_most_talent_node_at_rank(self.head, talent_node.parent.rank)
         self._shift_talent_nodes_right(talent_node, left_most_uncle)
 
         # the talent node's rank may have been updated, in store_task
@@ -35,7 +34,7 @@ class TTree:
         
         return
 
-    def access_task(self, task_name, talent_name) -> None:
+    def access_task(self, task_name: str, talent_name: str) -> None:
         """
         Accesses a task in the T Tree. The side-effect is shifting 
         this Talent Node to the left-most position at its depth.
@@ -155,6 +154,7 @@ class TTree:
         if root_node.left_child == None:
             talent_node = TalentNode(name=talent_name)
             root_node.left_child = talent_node
+            talent_node.parent = root_node
             return talent_node
 
         # if this root node has a child with the same starting rank, we can insert here
@@ -200,3 +200,18 @@ class TTree:
         Be careful! If promoted too early, there's a risk of losing subtalents
         """
         pass
+
+    def _get_left_most_talent_node_at_rank(self, talent_node: TalentNode, rank: int) -> TalentNode:
+        """
+        Gets the left most Talent Node at a given rank.
+        @param: talent_node: Node to start the search from.
+        @param: rank: Rank to search for.
+        @return: Left most Talent Node at the given rank.
+        """
+        # search down the left side of the talent tree until we find the rank
+        if talent_node.rank == rank:
+            return talent_node
+        
+        # if there is a left child, search down the left side
+        if talent_node.left_child:
+            return self._get_left_most_talent_node_at_rank(talent_node.left_child, rank)

@@ -15,18 +15,18 @@ class TalentNode:
         self.burnout_limit = burnout_limit # Start with a low burnout limit, but will grow
         self.max_tasks = max_tasks # Start with a low max tasks limit, but will grow
 
-    def store_task(self, task_name, current_time) -> None:
+    def store_task(self, talent_node, task_name, current_time) -> None:
         """
         Stores a task in the Talent Node.
         @param: task_name: Name of the task to store.
         @param: current_time: Time when the task was stored.
         """
-        self.recent_task_map[current_time] = task_name
-        self.last_access = current_time
+        talent_node.recent_task_map[current_time] = task_name
+        talent_node.last_access = current_time
         # TODO: need to check for relearn, ie it's been too long since current_time and last current_time
         # TODO: check to check for burnout, ie too frequent between tasks in list
-        if len(self.recent_task_map) >=  self.max_tasks:
-            self.convert_tasks_to_nodes()
+        if len(talent_node.recent_task_map) >=  talent_node.max_tasks:
+            talent_node._convert_tasks_to_nodes()
 
         # TODO: update access rank & move up the tree if needed (will this require a left and right root?)
         # TODO: move to left most node at depth and shift the rest down
@@ -81,9 +81,9 @@ class TalentNode:
         @param: new_task_node: Task Node to add.
         """
         if self.is_burnout:
-            self._insert_unbalanced_task_node(new_task_node, TalentNode.task_head)
+            self._insert_unbalanced_task_node(new_task_node, self.task_head)
         else:    
-            self._insert_balanced_task_node(new_task_node, TalentNode.task_head)
+            self._insert_balanced_task_node(new_task_node, self.task_head)
         return
     
     def _recall_task_from_tree(self, task_node, task_name, access_time) -> bool:
@@ -98,8 +98,10 @@ class TalentNode:
             # if the task is burnt out, we need to reset it
             task_node.is_burnt = False
             self._update_task_node_access_time(task_node, access_time)
+            # promote this one to the top of the tree
             self._promote_task_node_to_head(task_node)
-            task_node._heapify()
+            # and heapify the tree, excluding burnt out nodes
+            self._heapify_task_nodes(task_node)
             return True
         else:
             # if the task is not in the tree, we need to search the children
@@ -159,8 +161,8 @@ class TalentNode:
         @param: root_node: Root node to start the search
         """
         # if there is no head, make this the head
-        if TalentNode.task_head is None:
-            TalentNode.task_head = task_node
+        if self.task_head is None:
+            self.task_head = task_node
             return
         
         # if there is no left child, make this the left child
@@ -174,45 +176,46 @@ class TalentNode:
             return
 
         # if there are children, we need to go deeper
-        left_position = self._insert_balanced(task_node, root_node.left_child)
-        right_position = self._insert_balanced(task_node, root_node.right_child)
+        left_position = self._insert_balanced_task_node(task_node, root_node.left_child)
+        right_position = self._insert_balanced_task_node(task_node, root_node.right_child)
 
         return left_position or right_position
 
 
-    def _heapify(self, node=None):
+    def _heapify_task_nodes(self, task_node=None):
         """
         Balances the Task Node tree for all non-burnt out nodes in a
         max heap fashion based on last access time.
         @param: node: Node to start the heapify process from.
         """
-        if node is None:
-            node = TalentNode.task_head
+        if task_node is None:
+            task_node = self.task_head
 
         # Skip heapify for burnt out nodes or if node doesn't exist
-        if node is None or node.is_burnt:
+        if task_node is None or task_node.is_burnt:
             return  
 
-        largest = node
+        largest = task_node
 
-        if node.left_child and not node.left_child.is_burnt and node.left_child.last_access_time > node.last_access_time:
-            largest = node.left_child
-        if node.right_child and not node.right_child.is_burnt and node.right_child.last_access_time > largest.last_access_time:
-            largest = node.right_child
+        if task_node.left_child and not task_node.left_child.is_burnt and task_node.left_child.last_access_time > task_node.last_access_time:
+            largest = task_node.left_child
+        if task_node.right_child and not task_node.right_child.is_burnt and task_node.right_child.last_access_time > largest.last_access_time:
+            largest = task_node.right_child
 
-        if largest != node:
+        if largest != task_node:
             # Perform a swap
-            self._swap_node_content(node, largest)
+            self._swap_node_content(task_node, largest)
             # Recursively heapify the affected subtree
-            self._heapify(largest)
+            self._heapify_task_nodes(largest)
 
-    def _swap_node_content(self, node2):
+    def _swap_node_content(self, node1, node2):
         """
         Swaps the content of two nodes.
+        @param: node1: First node to swap.
         @param: node2: Second node to swap.
         """
-        self.task_name, node2.task_name = node2.task_name, self.task_name
-        self.creation_time, node2.creation_time = node2.creation_time, self.creation_time
-        self.last_access_time, node2.last_access_time = node2.last_access_time, self.last_access_time
-        self.is_burnt, node2.is_burnt = node2.is_burnt, self.is_burnt
+        node1.task_name, node2.task_name = node2.task_name, node1.task_name
+        node1.creation_time, node2.creation_time = node2.creation_time, node1.creation_time
+        node1.last_access_time, node2.last_access_time = node2.last_access_time, node1.last_access_time
+        node1.is_burnt, node2.is_burnt = node2.is_burnt, node1.is_burnt
 

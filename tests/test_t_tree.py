@@ -14,9 +14,7 @@ class TestTTree(unittest.TestCase):
         tree.add_task("Some short task", "TalentA")
 
         self.assertEqual(tree.head.right_child.name, "TalentB", "The right child's name should be 'TalentB'.")
-        self.assertIsNotNone(tree.head.right_child, "There should be a right child.")
         self.assertEqual(tree.head.left_child.name, "TalentA", "The left child's name should be 'TalentA'.")
-        self.assertIsNotNone(tree.head.left_child, "There should be a right child.")
 
     def test_add_three_talents(self):
         tree = TTree()
