@@ -28,5 +28,18 @@ class TestTTree(unittest.TestCase):
         self.assertIsNotNone(tree.head.left_child, "There should be a right child.")
         self.assertEqual(tree.lost_talents[0].name, "TalentB", "'TalentB' should have been moved to lost_talents.")
 
+    def test_time(self):
+        tree = TTree()
+        self.assertEqual(tree.time, 0, "The time should be 0 upon initialization.")
+        tree.add_task("Some long task", "TalentA")
+        self.assertEqual(tree.time, 1, "The time should be 1 after adding 1 task.")
+        tree.add_task("Some short task", "TalentA")
+        self.assertEqual(tree.time, 2, "The time should be 2 after adding 1 task.")
+        tree.add_task("Some medium task", "TalentC")
+        self.assertEqual(tree.time, 3, "The time should be 3 after adding 1 task.")
+        tree.access_task("Some long task", "TalentA")
+        self.assertEqual(tree.time, 4, "The time should be 4 after accessing an existing task.")
+        tree.access_task("Some long task", "TalentA")
+        self.assertEqual(tree.time, 5, "The time should be 5 after accessing a non-existing task.")
 if __name__ == '__main__':
     unittest.main()

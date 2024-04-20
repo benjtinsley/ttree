@@ -29,14 +29,13 @@ class TalentNode:
         # if the recent task map is full, convert the tasks to nodes
         if len(talent_node.recent_task_map) >=  talent_node.max_tasks:
             # but first, check for burnout
-            time_difference = 1
             greatest_time_difference = 1
             previous_time = list(talent_node.recent_task_map.keys())[0]
             for creation_time in range(1, len(talent_node.recent_task_map.keys())):
                 if creation_time - previous_time > greatest_time_difference:
                     greatest_time_difference = creation_time - previous_time
             
-            if greatest_time_difference <= time_difference:
+            if greatest_time_difference <= self.burnout_limit:
                 # if all the tasks were added in sequence, this talent node is burnt out
                 talent_node.is_burnout = True
             else:

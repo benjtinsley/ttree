@@ -44,11 +44,18 @@ class TTree:
         talent_node = self._find_talent_node(talent_name, self.head)
         # note that we look up the task and update the time here
         # this means if this task is not found, it burns time for us
-        task_found = talent_node.recall_task_from_map(task_name, self.capture_flowing_time())
+        current_time = self.capture_flowing_time()
+        # if the talent node is not found, we can't access the task.
+        # this means the talent node was added to lost_talents or was never added!
+        if not talent_node:
+            return
+        
+        task_found = talent_node.recall_task_from_map(task_name, current_time)
         
         if task_found:
-            # TODO: shift this node to left of the tree at this depth
-            # left_most_uncle = self._get_left_most_at_rank(talent_node.parent.rank)
+            # TODO: shift not working quite like we want it to
+            # move this node to the left most position at this depth
+            # left_most_uncle = self._get_left_most_talent_node_at_rank(self.head, talent_node.parent.rank)
             # self._shift_talent_nodes_right(talent_node, left_most_uncle)
             pass
 
