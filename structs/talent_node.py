@@ -15,6 +15,7 @@ class TalentNode:
         self.burnout_limit = burnout_limit # Start with a low burnout limit, but will grow
         self.max_tasks = max_tasks # Start with a low max tasks limit, but will grow
 
+    # Public functions
     def store_task(self, talent_node, task_name, current_time) -> None:
         """
         Stores a task in the Talent Node.
@@ -24,8 +25,25 @@ class TalentNode:
         talent_node.recent_task_map[current_time] = task_name
         talent_node.last_access = current_time
         # TODO: need to check for relearn, ie it's been too long since current_time and last current_time
-        # TODO: check to check for burnout, ie too frequent between tasks in list
+    
+        # if the recent task map is full, convert the tasks to nodes
         if len(talent_node.recent_task_map) >=  talent_node.max_tasks:
+            # but first, check for burnout
+            time_difference = 1
+            greatest_time_difference = 1
+            previous_time = list(talent_node.recent_task_map.keys())[0]
+            for creation_time in range(1, len(talent_node.recent_task_map.keys())):
+                if creation_time - previous_time > greatest_time_difference:
+                    greatest_time_difference = creation_time - previous_time
+            
+            if greatest_time_difference <= time_difference:
+                # if all the tasks were added in sequence, this talent node is burnt out
+                talent_node.is_burnout = True
+            else:
+                # variety is the spice of life
+                # TODO: make this more comprehensive?
+                talent_node.is_burnout = False
+
             talent_node._convert_tasks_to_nodes()
 
         # TODO: update access rank & move up the tree if needed (will this require a left and right root?)
@@ -53,27 +71,27 @@ class TalentNode:
         else:
             # if the task is not in the recent task map, we need to search the tree, starting from the head
             return self._recall_task_from_tree(self.task_head, task_name, access_time)
-        
+
+    # Private functions   
     def _convert_tasks_to_nodes(self):
         # convert the recent tasks to task nodes
         for creation_time, task in self.recent_task_map.items():
             task_node = TaskNode(task, creation_time, self.is_burnout)
             self._add_task_node(task_node)
 
+        # clear the recent task map now that they are converted to nodes
         self.recent_task_map.clear()
 
         # promote this node if it's not burnt out
         if not self.is_burnout:
-            # update the rank and the max_tasks, we've learned something!
+            # update the rank and the max_tasks, we've learned something! 
+            # this will make it easier to learn more
             self.rank += 1
             self.max_tasks += 1
             # every other time we learn something, we increase the burnout limit
             if self.max_tasks % 2 != 0:
                 self.burnout_limit += 1
 
-
-
-    # Public functions
     def _add_task_node(self, new_task_node) -> None:
         """
         Adds a node to the Task Node tree.
@@ -110,7 +128,6 @@ class TalentNode:
                 return self._recall_task_from_tree(task_node.right_child, task_name, access_time)
         return False
     
-    # Private functions
     def _update_task_node_access_time(self, task_node, access_time) -> None:
         """
         Updates the last access time of the task.
@@ -130,7 +147,7 @@ class TalentNode:
         if not task_node.parent:
             return
         else:
-            self._swap_node_content(task_node, task_node.parent)
+            self._swap_task_node_content(task_node, task_node.parent)
         
         return self._promote_task_node_to_head(task_node.parent)
 
@@ -203,13 +220,13 @@ class TalentNode:
 
         if largest != task_node:
             # Perform a swap
-            self._swap_node_content(task_node, largest)
+            self._swap_task_node_content(task_node, largest)
             # Recursively heapify the affected subtree
             self._heapify_task_nodes(largest)
 
-    def _swap_node_content(self, node1, node2):
+    def _swap_task_node_content(self, node1, node2):
         """
-        Swaps the content of two nodes.
+        Swaps the content of two task nodes.
         @param: node1: First node to swap.
         @param: node2: Second node to swap.
         """
