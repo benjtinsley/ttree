@@ -48,7 +48,7 @@ class TalentNode:
                 # TODO: make this more comprehensive?
                 talent_node.is_burnout = False
 
-            talent_node._convert_tasks_to_nodes()
+            talent_node.__convert_tasks_to_nodes()
 
         # TODO: update access rank & move up the tree if needed (will this require a left and right root?)
         # TODO: move to left most node at depth and shift the rest down
@@ -74,14 +74,14 @@ class TalentNode:
                 return True
         else:
             # if the task is not in the recent task map, we need to search the tree, starting from the head
-            return self._recall_task_from_tree(self.task_head, task_name, access_time)
+            return self.__recall_task_from_tree(self.task_head, task_name, access_time)
 
     # Private functions   
-    def _convert_tasks_to_nodes(self):
+    def __convert_tasks_to_nodes(self):
         # convert the recent tasks to task nodes
         for creation_time, task in self.recent_task_map.items():
             task_node = TaskNode(task, creation_time, self.is_burnout)
-            self._add_task_node(task_node)
+            self.__add_task_node(task_node)
 
         # clear the recent task map now that they are converted to nodes
         self.recent_task_map.clear()
@@ -99,18 +99,18 @@ class TalentNode:
         self.rank += 1
         # TODO: function to handle rank increase & promotion?
 
-    def _add_task_node(self, new_task_node) -> None:
+    def __add_task_node(self, new_task_node) -> None:
         """
         Adds a node to the Task Node tree.
         @param: new_task_node: Task Node to add.
         """
         if self.is_burnout:
-            self._insert_unbalanced_task_node(new_task_node, self.task_head)
+            self.__insert_unbalanced_task_node(new_task_node, self.task_head)
         else:    
-            self._insert_balanced_task_node(new_task_node, self.task_head)
+            self.__insert_balanced_task_node(new_task_node, self.task_head)
         return
 
-    def _recall_task_from_tree(self, task_node, task_name, access_time) -> bool:
+    def __recall_task_from_tree(self, task_node, task_name, access_time) -> bool:
         """
         Recalls a task from the Task Node tree.
         @param: task_node: Node to start the search from.
@@ -121,21 +121,21 @@ class TalentNode:
         if task_node.task_name == task_name:
             # if the task is burnt out, we need to reset it
             task_node.is_burnt = False
-            self._update_task_node_access_time(task_node, access_time)
+            self.__update_task_node_access_time(task_node, access_time)
             # promote this one to the top of the tree
-            self._promote_task_node_to_head(task_node)
+            self.__promote_task_node_to_head(task_node)
             # and heapify the tree, excluding burnt out nodes
-            self._heapify_task_nodes(task_node)
+            self.__heapify_task_nodes(task_node)
             return True
         else:
             # if the task is not in the tree, we need to search the children
             if task_node.left_child:
-                return self._recall_task_from_tree(task_node.left_child, task_name, access_time)
+                return self.__recall_task_from_tree(task_node.left_child, task_name, access_time)
             if task_node.right_child:
-                return self._recall_task_from_tree(task_node.right_child, task_name, access_time)
+                return self.__recall_task_from_tree(task_node.right_child, task_name, access_time)
         return False
     
-    def _update_task_node_access_time(self, task_node, access_time) -> None:
+    def __update_task_node_access_time(self, task_node, access_time) -> None:
         """
         Updates the last access time of the task.
         @param: task_node: Task Node to update.
@@ -143,7 +143,7 @@ class TalentNode:
         """
         task_node.last_access_time = access_time
     
-    def _promote_task_node_to_head(self, task_node) -> None:
+    def __promote_task_node_to_head(self, task_node) -> None:
         """
         Promotes a Task Node up the tree.
         This allows us to favor the most recently accessed tasks
@@ -154,11 +154,11 @@ class TalentNode:
         if not task_node.parent:
             return
         else:
-            self._swap_task_node_content(task_node, task_node.parent)
+            self.__swap_task_node_content(task_node, task_node.parent)
         
-        return self._promote_task_node_to_head(task_node.parent)
+        return self.__promote_task_node_to_head(task_node.parent)
 
-    def _insert_unbalanced_task_node(self, task_node, current_node) -> None:
+    def __insert_unbalanced_task_node(self, task_node, current_node) -> None:
         """
         Inserts a Task Node into the tree on the far right side, out of balance.
         @param: task_node: Task Node to insert.
@@ -175,9 +175,9 @@ class TalentNode:
             return
         
         # if there are children, we need to go deeper
-        return self._insert_unbalanced_task_node(task_node, current_node.right_child)
+        return self.__insert_unbalanced_task_node(task_node, current_node.right_child)
 
-    def _insert_balanced_task_node(self, task_node, root_node):
+    def __insert_balanced_task_node(self, task_node, root_node):
         """
         Inserts a Task Node into the tree in a balanced manner, top to bottom, left to right
         @param: task_node: Task Node to insert.
@@ -199,13 +199,13 @@ class TalentNode:
             return
 
         # if there are children, we need to go deeper
-        left_position = self._insert_balanced_task_node(task_node, root_node.left_child)
-        right_position = self._insert_balanced_task_node(task_node, root_node.right_child)
+        left_position = self.__insert_balanced_task_node(task_node, root_node.left_child)
+        right_position = self.__insert_balanced_task_node(task_node, root_node.right_child)
 
         return left_position or right_position
 
 
-    def _heapify_task_nodes(self, task_node=None):
+    def __heapify_task_nodes(self, task_node=None):
         """
         Balances the Task Node tree for all non-burnt out nodes in a
         max heap fashion based on last access time.
@@ -227,11 +227,11 @@ class TalentNode:
 
         if largest != task_node:
             # Perform a swap
-            self._swap_task_node_content(task_node, largest)
+            self.__swap_task_node_content(task_node, largest)
             # Recursively heapify the affected subtree
-            self._heapify_task_nodes(largest)
+            self.__heapify_task_nodes(largest)
 
-    def _swap_task_node_content(self, node1, node2):
+    def __swap_task_node_content(self, node1, node2):
         """
         Swaps the content of two task nodes.
         @param: node1: First node to swap.
