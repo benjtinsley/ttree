@@ -5,6 +5,7 @@ class TTree:
     def __init__(self):
         # Track total actions or time across the entire T Tree
         self.time = 0  
+        self.total_nodes = 0
         self.lost_talents = []
         # The head node is an infinite rank Talent Node that is unreachable and unknown
         # TODO: should this be a different kind of node that can scale?
@@ -12,18 +13,20 @@ class TTree:
     
     # Public functions
     def add_task(self, task_name: str, talent_name: str) -> None:
-        
+        # first, try to find the talent node
         talent_node = self._find_talent_node(talent_name, self.head)
 
+        # if the talent node is not found, we need to add it
         if not talent_node:
             talent_node = self.__add_talent_node(talent_name, self.head)
+            # and increment the total number of nodes
+            self.total_nodes += 1
 
         # grab the starting rank of the talent node for comparison later
         starting_rank = talent_node.rank
         current_time = self.capture_flowing_time()
-        total_nodes = self._count_total_talents(self.head)
-        talent_node.store_task(talent_node, task_name, current_time, total_nodes)
-        
+        talent_node.store_task(talent_node, task_name, current_time, self.total_nodes)
+
         # add this node to the left most position at this depth
         left_most_uncle = self.__get_left_most_talent_node_at_rank(self.head, talent_node.parent.rank)
         self.__shift_talent_nodes_right(talent_node, left_most_uncle)
@@ -142,6 +145,7 @@ class TTree:
             # we have reached the end of the tree
             # and must lose this talent
             self.lost_talents.append(sent_node)
+            self.total_nodes -= 1
         
         return
 

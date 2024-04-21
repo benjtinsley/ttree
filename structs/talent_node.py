@@ -2,10 +2,10 @@ from structs.task_node import TaskNode
 
 class TalentNode:
     def __init__(self, name, burnout_limit = 2, max_tasks = 5, rank = 0):
-        self.name = name
         self.parent = None
         self.left_child = None
         self.right_child = None
+        self.name = name
         self.recent_task_map = {}
         self.is_burnout = False
         self.is_mastered = False # TODO: make this apparent by rank and burnout limit
@@ -21,6 +21,7 @@ class TalentNode:
         Stores a task in the Talent Node.
         @param: task_name: Name of the task to store.
         @param: current_time: Time when the task was stored.
+        @param: total_nodes: Total number of Talent Nodes in the tree.
         """
         # as long as we have an item in the recent task map, we need to see
         # if it's been too long since the last task
