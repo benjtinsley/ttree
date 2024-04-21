@@ -22,8 +22,10 @@ class TalentNode:
         @param: task_name: Name of the task to store.
         @param: current_time: Time when the task was stored.
         """
-        # if it's been too long since the last task, we need to relearn
+        # as long as we have an item in the recent task map, we need to see
+        # if it's been too long since the last task
         if len(talent_node.recent_task_map) > 0:
+            # get the last time a task was added
             last_time = list(talent_node.recent_task_map.keys())[-1]
             # if the time between the last task and this task is greater than the total nodes * 2
             if current_time - last_time >= total_nodes * 2:

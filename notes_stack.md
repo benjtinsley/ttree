@@ -7,6 +7,7 @@
 - [x] set burnout
 
 ## Running things to do
+- [ ] determine what conditions cause mastery
 - [ ] __convert_tasks_to_nodes: 3rd party function to handle rank increase & promotion
 - [ ] talent node shifting has the tendency to duplicate nodes
 - [ ] Promote talent nodes based on rank & move cut off nodes to lost_memory
@@ -20,5 +21,5 @@
 - [x] circular dependency pulling TalentNode class into task_node.py. should TalentNode own all the talent node functionality as well? refactor in order because I can't set or get the task_head in the current layout
 
 ## Random thoughts
-- Mastery allows new tasks to be immediately converted into talent nodes, without the need for the map
+- Mastery allows new tasks to be immediately converted into talent nodes, without the need for the map, bypassing burnout and relearn
 - Relearn interval between tasks is 2 * total talent nodes - 1

@@ -15,6 +15,7 @@ class TestTTree(unittest.TestCase):
 
         self.assertEqual(tree.head.right_child.name, "TalentB", "The right child's name should be 'TalentB'.")
         self.assertEqual(tree.head.left_child.name, "TalentA", "The left child's name should be 'TalentA'.")
+        self.assertEqual(tree._count_total_talents(tree.head), 2, "There should be 2 talents in the tree.")
 
     def test_add_three_talents_with_losses(self):
         tree = TTree()
@@ -27,6 +28,7 @@ class TestTTree(unittest.TestCase):
         self.assertEqual(tree.head.left_child.name, "TalentC", "The left child's name should be 'TalentC'.")
         self.assertIsNotNone(tree.head.left_child, "There should be a right child.")
         self.assertEqual(tree.lost_talents[0].name, "TalentB", "'TalentB' should have been moved to lost_talents.")
+        self.assertEqual(tree._count_total_talents(tree.head), 2, "There should be 2 talents in the tree.")
 
     def test_time(self):
         tree = TTree()
