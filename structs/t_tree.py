@@ -34,7 +34,8 @@ class TTree:
         # the talent node's rank may have been updated, in store_task
         # if so, a promotion is in order
         if talent_node.rank > starting_rank:
-            self.__promote_talent_node()
+            # self.__promote_talent_node()
+            pass
         
         return
 
@@ -54,7 +55,7 @@ class TTree:
         if not talent_node:
             return
         
-        task_found = talent_node.recall_task_from_map(task_name, current_time)
+        task_found = talent_node.recall_task(talent_node.task_head, task_name, current_time)
         
         if task_found:
             # TODO: shift not working quite like we want it to
@@ -183,12 +184,18 @@ class TTree:
         # otherwise, we need to keep searching down the left side of the tree
         return self.__add_talent_node(talent_name, root_node.left_child)
         
-    def __promote_talent_node(self) -> None:
+    def __promote_talent_node(self, promoted_node) -> None:
         """
         Promotes a Talent Node up the T Tree.
-        Be careful! If promoted too early, there's a risk of losing subtalents
+        Be careful! If promoted too early, there's a risk of losing talents
+        @param: promoted_node: Node to promote.
         """
-        pass
+
+        old_rank = promoted_node.rank - 1
+        old_parent = promoted_node.parent
+        old_left_child = promoted_node.left_child
+        old_right_child = promoted_node.right_child
+        
 
     def __get_left_most_talent_node_at_rank(self, talent_node: TalentNode, rank: int) -> TalentNode:
         """
