@@ -7,6 +7,7 @@
 - [x] set burnout
 
 ## Running things to do
+- [ ] make talent node last_access better integrated
 - [ ] t tree head node a different type to allow scaling?
 - [ ] determine what conditions cause mastery
 - [ ] __convert_tasks_to_nodes: 3rd party function to handle rank increase & promotion

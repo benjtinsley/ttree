@@ -105,6 +105,59 @@ class TTree:
             grandparent_node = parent_node.parent
             return grandparent_node.right_child.left_child
     
+    def __get_talent_node_list_at_rank(self, rank: int,  root: TalentNode=None, node_list: list=None) -> list:
+        """
+        Gets all Talent Nodes at a given rank using an in order recursive search.
+        @param: rank: Rank to search for.
+        @return: List of Talent Nodes at the given rank from left to right.
+        """
+        # initialize the search from the head node
+        if root is None:
+            root = self.head
+            node_list = []
+
+        # if we are at the rank, add this node to the list
+        if root.rank == rank:
+            return node_list.append(root)
+        
+        # if there is a left child, search down the left side
+        if root.left_child:
+            self.__get_talent_node_list_at_rank(rank, root.left_child, node_list)
+        
+        # if there is a right child, search down the right side
+        if root.right_child:
+            self.__get_talent_node_list_at_rank(rank, root.right_child, node_list)
+
+        return node_list
+    
+    def __push_subtree_to_lost_talents(self, node: TalentNode) -> None:
+        """
+        Recursively pushes a subtree to the lost talents array.
+        This is a sad function.
+        @param: node: Node to start the push from.
+        """
+        # if there are no more nodes to push, return
+        if node is None:
+            return
+        
+        # dissolve the bonds that once held this node to the tree
+        node.parent = None
+
+        if node.parent.left_child == node:
+            node.parent.left_child = None
+        else:
+            node.parent.right_child = None
+
+        # push the node to the lost talents
+        self.lost_talents.append(node)
+        # we lost a good one
+        self.total_nodes -= 1
+
+        # recurse
+        self.__push_subtree_to_lost_talents(node.left_child)
+        self.__push_subtree_to_lost_talents(node.right_child)
+
+        return
 
     def __shift_talent_nodes_right(self, new_node: TalentNode, root_node: TalentNode) -> None:
         """
@@ -144,11 +197,51 @@ class TTree:
             return self.__shift_talent_nodes_right(sent_node, uncle_node)
         else:
             # we have reached the end of the tree
-            # and must lose this talent
-            self.lost_talents.append(sent_node)
-            self.total_nodes -= 1
+            # and must lose this talent and its children
+            self.__push_subtree_to_lost_talents(sent_node)
         
         return
+    
+    def __shift_talent_nodes_left(self, node_list: list, new_parent_node: TalentNode, new_left_child: TalentNode, new_right_child: TalentNode) -> None:
+        """
+        Recursively shifts a list of nodes to the left until
+        there are no more parents to shift to, then it adds the remaining
+        nodes to the lost_talents array along with their subtrees
+        @param: node_list: List of nodes to shift left
+        @param: new_parent_node: Parent node to shift to
+        @param: new_left_child: Initial left node to work with
+        @param: new_right_child: Initial right node to work with
+        """
+        # if there are no more nodes to shift, return
+        if not node_list:
+            return
+        
+        node = node_list.pop(0)
+        next_left_child = node.left_child
+        next_right_child = node.right_child
+
+        # there's no more parents to shift to, so the rest of the nodes
+        # and all children need to be added to the lost_talents array
+        if not new_parent_node:
+            for node in node_list:
+                self.__push_subtree_to_lost_talents(node)
+            self.__push_subtree_to_lost_talents(new_left_child)
+            self.__push_subtree_to_lost_talents(new_right_child)
+        else:
+            # check if the left child has already been placed
+            if new_parent_node.left_child.rank == node.rank:
+                new_parent_node.right_child = node
+                next_parent = self.__get_right_sibling(new_parent_node)
+            # otherwise just place it in the left child
+            else:
+                new_parent_node.left_child = node
+                next_parent = new_parent_node
+
+            node.parent = new_parent_node
+
+        # recurse
+        self.__shift_talent_nodes_left(node_list, next_parent, next_left_child, next_right_child)
+
 
     def __update_time(self) -> None:
         """
@@ -184,17 +277,84 @@ class TTree:
         # otherwise, we need to keep searching down the left side of the tree
         return self.__add_talent_node(talent_name, root_node.left_child)
         
-    def __promote_talent_node(self, promoted_node) -> None:
+    def __promote_talent_node(self, promoted_node: TalentNode) -> None:
         """
         Promotes a Talent Node up the T Tree.
         Be careful! If promoted too early, there's a risk of losing talents
         @param: promoted_node: Node to promote.
         """
-
+        # first, we need to get some information about the promoted node and its surroundings
         old_rank = promoted_node.rank - 1
         old_parent = promoted_node.parent
+        old_sibling = old_parent.right_child
         old_left_child = promoted_node.left_child
         old_right_child = promoted_node.right_child
+
+        new_sibling = old_parent if old_parent.rank == promoted_node.rank else None
+        if new_sibling:
+            new_parent = old_parent.parent
+            is_promotion_rank_new = False
+        else:
+            new_parent = None
+            is_promotion_rank_new = True
+
+        # if we are creating a new rank in the tree, we will potentially
+        # move nodes to the lost_talent array at these levels:
+        # - old rank
+        # - old child rank
+        # but not at
+        # - new rank
+        if is_promotion_rank_new:
+            if old_sibling:
+                # first we need to remove the promoted node from the old parent
+                # and shift all the other nodes at that rank to the left
+                old_ranked_nodes = self.__get_talent_node_list_at_rank(old_rank)
+                # we need to push the old_sibling into the promoted_node's old spot and
+                # inherit the promoted_nodes's old children
+                self.__shift_talent_nodes_left(old_ranked_nodes, promoted_node, old_left_child, old_right_child)
+        
+        # if the node is being inserted at a rank that already exists, we will potentially
+        # move nodes to the lost_talent array at these levels:
+        # - new rank
+        # - old child rank
+        # but not at
+        # - old rank
+        else:
+            # first we need to remove the promoted node from the old parent
+            # and shift all the other nodes at that rank to the left
+            old_ranked_nodes = self.__get_talent_node_list_at_rank(old_rank)
+            # we need to push the old_sibling into the promoted_node's old spot and
+            # inherit the promoted_nodes's old children
+            self.__shift_talent_nodes_left(old_ranked_nodes, promoted_node, old_left_child, old_right_child)
+            # now we can add the promoted node to the new parent and shift all the other nodes
+            self.__shift_talent_nodes_right(promoted_node, new_parent)
+            # TODO: fix the __shift_talent_nodes_right function to work as expected
+
+        # Are we done here?
+        return
+
+        # if old parent rank is greater than promoted_node rank, we can leave
+        # the parent connection intact
+        # .. if the rank is the same, we need to get the parent's parent and connect 
+        # the promoted node to that
+        # then shift all the other nodes on the promoted nodes rank to the right using
+        # __shift_talent_nodes_right to accommodate the new promoted node
+
+        # now we need to worry about the old_sibling
+
+        # if it had an old_sibling, we need to mark the sibling to be the new promoted node' 
+        # left child and shift over any other nodes to the left
+
+        # any nodes that can't fit in the new row, we need to send to lost talents
+
+        # now we need to give the new left child the old left child and old right child
+        # and shift all the other nodes at that rank to the right
+
+        # things that are useful to know:
+        # - the old_rank is 0: we don't need to determine what to do with children
+        # - there is a old_right_child: we need to attempt a shift, otherwise we just deal with the old_left_child
+        # - there is a old_sibling: we need to attempt a shift left at the old_rank level
+        # - promoted_node.rank != old_parent.rank: we can just leave the parent level alone
         
 
     def __get_left_most_talent_node_at_rank(self, talent_node: TalentNode, rank: int) -> TalentNode:
@@ -213,7 +373,7 @@ class TTree:
             return self.__get_left_most_talent_node_at_rank(talent_node.left_child, rank)
 
     # Internal functions
-    def _count_total_talents(self, root_node, count=0) -> int:
+    def _count_total_talents(self, root_node: TalentNode, count: int=0) -> int:
         """
         Counts the total number of talents in the T Tree.
         @param: count: Total number of talents.
