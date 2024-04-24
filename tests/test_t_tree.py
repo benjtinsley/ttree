@@ -1,5 +1,6 @@
 import unittest
 from structs import TTree
+from .helpers import TestHelpers
 
 class TestTTree(unittest.TestCase):
     def test_add_single_talent(self):
@@ -17,7 +18,10 @@ class TestTTree(unittest.TestCase):
         self.assertEqual(tree.head.left_child.name, "TalentA", "The left child's name should be 'TalentA'.")
         self.assertEqual(tree._count_total_talents(tree.head), tree.total_nodes, "There should be 2 talents in the tree.")
 
-    def test_add_three_talents_with_losses(self):
+    def test_add_three_talents_with_lost_node(self):
+        """
+        Test to see if the tree pushes nodes that can't fit into the lost talents
+        """
         tree = TTree()
         tree.add_task("Some long task", "TalentB")
         tree.add_task("Some short task", "TalentA")
@@ -43,5 +47,12 @@ class TestTTree(unittest.TestCase):
         self.assertEqual(tree.time, 4, "The time should be 4 after accessing an existing task.")
         tree.access_task("Some long task", "TalentA")
         self.assertEqual(tree.time, 5, "The time should be 5 after accessing a non-existing task.")
+
+    def test_promote_talent_in_balanced_tree(self):
+        tree = TTree()
+        final_node = TestHelpers().build_robust_balanced_tree(tree)
+        # add one more task to promote the talent
+        tree.add_task("Promotional task", final_node)
+
 if __name__ == '__main__':
     unittest.main()

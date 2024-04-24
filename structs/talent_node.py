@@ -11,7 +11,7 @@ class TalentNode:
     @param: max_tasks: Maximum number of tasks allowed before converting to nodes.
     @param: rank: Rank of the Talent Node.
     """
-    def __init__(self, name, burnout_limit = 2, max_tasks = 5, rank = 0):
+    def __init__(self, name: str, burnout_limit: int = 2, max_tasks: int = 5, rank: int = 0):
         self.parent = None
         self.left_child = None
         self.right_child = None

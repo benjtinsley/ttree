@@ -111,6 +111,9 @@ class TTree:
         @param: rank: Rank to search for.
         @return: List of Talent Nodes at the given rank from left to right.
         """
+
+        # TODO: Convert to DFS?
+
         # initialize the search from the head node
         if root is None:
             root = self.head
@@ -141,12 +144,13 @@ class TTree:
             return
         
         # dissolve the bonds that once held this node to the tree
+        old_parent = node.parent
         node.parent = None
 
-        if node.parent.left_child == node:
-            node.parent.left_child = None
+        if old_parent.left_child == node:
+            old_parent.left_child = None
         else:
-            node.parent.right_child = None
+            old_parent.right_child = None
 
         # push the node to the lost talents
         self.lost_talents.append(node)
