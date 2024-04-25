@@ -1,5 +1,6 @@
 # Notes, next steps, etc
 ## Current task
+- [ ] correct errors in tests for adding build_robust_balanced_tree for promotion testing 
 - [x] test relearn -> total nodes is returning raised to the power of 3
 - [x] test burnout toggle off -> __insert_balanced_task_node is getting max recursion depth
 - [x] test burnout - burnout never being set to true -> recent_task_map not storing all values -> ~time not being updated~ lost_talents cant be found
@@ -7,12 +8,13 @@
 - [x] set burnout
 
 ## Running things to do
+- [ ] get node list by rank as DFS search to rank?
 - [ ] make talent node last_access better integrated
 - [ ] t tree head node a different type to allow scaling?
 - [ ] determine what conditions cause mastery
-- [ ] __convert_tasks_to_nodes: 3rd party function to handle rank increase & promotion
+- [x] __convert_tasks_to_nodes: 3rd party function to handle rank increase & promotion
 - [ ] talent node shifting has the tendency to duplicate nodes
-- [ ] Promote talent nodes based on rank & move cut off nodes to lost_memory
+- [x] Promote talent nodes based on rank & move cut off nodes to lost_memory
 - [x] How mastery (if built) affects burnout? (see below [Random thoughts](#random-thoughts) - burnout can't happen in that talent node)
 - [ ] Visualization
 - [x] Build methods for quicker access to task nodes in tests? (internal functions)
@@ -23,5 +25,6 @@
 - [x] circular dependency pulling TalentNode class into task_node.py. should TalentNode own all the talent node functionality as well? refactor in order because I can't set or get the task_head in the current layout
 
 ## Random thoughts
+- lost_talents as tuple? convert to list and restore as a tuple when things need to be added in order to explicitly imply it can't be modified
 - Mastery allows new tasks to be immediately converted into talent nodes, without the need for the map, bypassing burnout and relearn
 - Relearn interval between tasks is 2 * total talent nodes - 1

@@ -20,7 +20,7 @@ class TestTTree(unittest.TestCase):
 
     def test_add_three_talents_with_lost_node(self):
         """
-        Test to see if the tree pushes nodes that can't fit into the lost talents
+        Test to see if the tree pushes nodes that can't fit into the lost talents list.
         """
         tree = TTree()
         tree.add_task("Some long task", "TalentB")

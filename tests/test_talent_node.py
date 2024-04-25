@@ -1,5 +1,6 @@
 import unittest
 from structs import TTree
+from .helpers import TestHelpers
 
 class TestTalentNode(unittest.TestCase):
     def test_check_talent_node_exists(self):
@@ -31,11 +32,10 @@ class TestTalentNode(unittest.TestCase):
 
     def test_relearn(self):
         tree = TTree()
-        tasks = ['1', '2', '3', '4', '5', '6', '7']
         talents = ["TalentA", "TalentB", "TalentB", "TalentB", "TalentB", "TalentB",  "TalentA"]
-        for task in tasks:
+        for i in range(7):
             talent = talents.pop()
-            tree.add_task(task, talent)
+            TestHelpers().add_single_task(tree, talent)
         node = tree._find_talent_node("TalentA", tree.head)
         self.assertEqual(node.recent_task_map, {}, "The Talent Node should have an empty recent task map waiting too long between tasks (most recent add time - last add time is >= 2 x the amount of talent nodes).")
 
