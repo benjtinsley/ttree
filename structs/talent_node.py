@@ -13,8 +13,8 @@ class TalentNode:
     """
     def __init__(self, name: str, burnout_limit: int = 2, max_tasks: int = 5, rank: int = 0):
         self.parent = None
-        self.left_child = None
-        self.right_child = None
+        self.child_left = None
+        self.child_right = None
         self.name = name
         self.recent_task_map = {}
         self.is_burnout = False
@@ -140,10 +140,10 @@ class TalentNode:
             return True
         else:
             # if the task is not in the tree, we need to search the children
-            if task_node.left_child:
-                return self.__recall_task_from_tree(task_node.left_child, task_name, current_time)
-            if task_node.right_child:
-                return self.__recall_task_from_tree(task_node.right_child, task_name, current_time)
+            if task_node.child_left:
+                return self.__recall_task_from_tree(task_node.child_left, task_name, current_time)
+            if task_node.child_right:
+                return self.__recall_task_from_tree(task_node.child_right, task_name, current_time)
         return False
     
     def __convert_tasks_to_nodes(self, task_map: dict) -> None:
@@ -218,13 +218,13 @@ class TalentNode:
             return
         
         # we only search down the right side of the tree if we are burnt out
-        if not current_node.right_child:
-            current_node.right_child = task_node
+        if not current_node.child_right:
+            current_node.child_right = task_node
             task_node.parent = current_node
             return
         
         # if there are children, we need to go deeper
-        return self.__insert_unbalanced_task_node(task_node, current_node.right_child)
+        return self.__insert_unbalanced_task_node(task_node, current_node.child_right)
 
     def __insert_balanced_task_node(self, task_node: TaskNode, root_node: int) -> bool:
         """
@@ -244,28 +244,28 @@ class TalentNode:
             if not task_node.is_burnt:
                 # make this the head
                 self.task_head.parent = task_node
-                task_node.right_child = self.task_head
+                task_node.child_right = self.task_head
                 self.task_head = task_node
                 return True
         
         # if there is no left child, make this the left child
-        if root_node.left_child is None:
-            root_node.left_child = task_node
+        if root_node.child_left is None:
+            root_node.child_left = task_node
             task_node.parent = root_node
             return True
         
         # if there is no right child, make this the right child
-        if root_node.right_child is None:
-            root_node.right_child = task_node
+        if root_node.child_right is None:
+            root_node.child_right = task_node
             task_node.parent = root_node
             return True
 
         # if there are children, we need to go deeper
-        left_position = self.__insert_balanced_task_node(task_node, root_node.left_child)
+        left_position = self.__insert_balanced_task_node(task_node, root_node.child_left)
         
         # we don't want to go down the right side if we find a burnt out node
-        if not root_node.right_child.is_burnt:
-            right_position = self.__insert_balanced_task_node(task_node, root_node.right_child)
+        if not root_node.child_right.is_burnt:
+            right_position = self.__insert_balanced_task_node(task_node, root_node.child_right)
         
         return left_position or right_position
 
@@ -285,10 +285,10 @@ class TalentNode:
 
         largest = task_node
 
-        if task_node.left_child and not task_node.left_child.is_burnt and task_node.left_child.last_access_time > task_node.last_access_time:
-            largest = task_node.left_child
-        if task_node.right_child and not task_node.right_child.is_burnt and task_node.right_child.last_access_time > largest.last_access_time:
-            largest = task_node.right_child
+        if task_node.child_left and not task_node.child_left.is_burnt and task_node.child_left.last_access_time > task_node.last_access_time:
+            largest = task_node.child_left
+        if task_node.child_right and not task_node.child_right.is_burnt and task_node.child_right.last_access_time > largest.last_access_time:
+            largest = task_node.child_right
 
         if largest != task_node:
             # Perform a swap
@@ -318,8 +318,8 @@ class TalentNode:
         if task_node.task_name == task_name:
             return task_node
         else:
-            if task_node.left_child:
-                return self._find_task_node(task_name, task_node.left_child)
-            if task_node.right_child:
-                return self._find_task_node(task_name, task_node.right_child)
+            if task_node.child_left:
+                return self._find_task_node(task_name, task_node.child_left)
+            if task_node.child_right:
+                return self._find_task_node(task_name, task_node.child_right)
         return None

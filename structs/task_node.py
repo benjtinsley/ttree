@@ -1,7 +1,7 @@
 class TaskNode:
     def __init__(self, task_name, creation_time, is_burnt):
-        self.left_child = None  # Pointer to the left child Task Node
-        self.right_child = None  # Pointer to the right child Task Node
+        self.child_left = None  # Pointer to the left child Task Node
+        self.child_right = None  # Pointer to the right child Task Node
         self.parent = None  # Pointer to the parent Task Node
         self.task_name = task_name  # Name or description of the task
         self.creation_time = creation_time  # Time when the task was created
