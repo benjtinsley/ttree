@@ -53,6 +53,8 @@ class TestTTree(unittest.TestCase):
         final_node = TestHelpers().build_robust_balanced_tree(tree)
         # add one more task to promote the talent
         tree.add_task("Promotional task", final_node)
+        self.assertEqual(tree._find_talent_node(final_node, tree.head).rank, 1, "The talent should have been promoted to rank 1.")
+        self.assertEqual(tree._count_total_talents(tree.head), tree.total_nodes, "There should be 7 talents in the tree.")
 
 if __name__ == '__main__':
     unittest.main()

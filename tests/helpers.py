@@ -5,8 +5,10 @@ from structs import TTree, TalentNode
 class TestHelpers:
     def build_robust_balanced_tree(self, tree) -> str:
         """
-        Builds a tree with 7 talents, each non-leaf node with 2 children.
+        Builds a tree with 8 talents, each non-infinite, non-leaf node with 2 children.
         The ranks are as follows:
+             ∞
+             |
              2
             /  \\
            1   1

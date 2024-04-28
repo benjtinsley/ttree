@@ -8,6 +8,7 @@
 - [x] set burnout
 
 ## Running things to do
+- [ ] use __add_bonds and __dissolve_bonds where appropriate, rather than manually doing it
 - [ ] get node list by rank as DFS search to rank?
 - [ ] make talent node last_access better integrated
 - [ ] t tree head node a different type to allow scaling?

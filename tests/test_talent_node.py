@@ -38,6 +38,5 @@ class TestTalentNode(unittest.TestCase):
             TestHelpers().add_single_task(tree, talent)
         node = tree._find_talent_node("TalentA", tree.head)
         self.assertEqual(node.recent_task_map, {}, "The Talent Node should have an empty recent task map waiting too long between tasks (most recent add time - last add time is >= 2 x the amount of talent nodes).")
-
 if __name__ == '__main__':
     unittest.main()
