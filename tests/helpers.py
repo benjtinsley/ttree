@@ -8,7 +8,7 @@ class TestHelpers:
         Builds a tree with 8 talents, each non-infinite, non-leaf node with 2 children.
         The ranks are as follows:
              ∞
-             |
+              /
              2
             /  \\
            1   1

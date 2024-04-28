@@ -29,7 +29,10 @@ class TTree:
         talent_node.store_task(talent_node, task_name, current_time, self.total_nodes)
         parent_rank = talent_node.parent.rank if talent_node.parent else None
 
-        # add this node to the left most position at this depth
+        if talent_node.parent:
+            # create a temporary node to hold this node's bonds
+            self.__create_temporary_node(talent_node)
+            # add this node to the left most position at its depth
         left_most_uncle = self.__get_left_most_talent_node_at_rank(self.head, parent_rank)
         self.__shift_talent_nodes_right(talent_node, left_most_uncle)
 
@@ -59,9 +62,11 @@ class TTree:
         task_found = talent_node.recall_task(talent_node.task_head, task_name, current_time)
         
         if task_found:
-            # TODO: shift not working quite like we want it to
-            # move this node to the left most position at this depth
-            left_most_uncle = self.__get_left_most_talent_node_at_rank(self.head, talent_node.parent.rank)
+            parent_rank = talent_node.parent.rank
+            # create a temporary node to hold this node's bonds
+            self.__create_temporary_node(talent_node)
+            # then shift the talent node to the left most position at its depth
+            left_most_uncle = self.__get_left_most_talent_node_at_rank(self.head, parent_rank)
             self.__shift_talent_nodes_right(talent_node, left_most_uncle)
             pass
 
@@ -113,34 +118,20 @@ class TTree:
             if not grandparent_node.child_right.child_left:
                 return None
             return grandparent_node.child_right.child_left
-    
-    def __get_talent_node_list_at_rank(self, rank: int,  root: TalentNode=None, node_list: list=None) -> list:
-        """
-        Gets all Talent Nodes at a given rank using an in order recursive search.
-        @param: rank: Rank to search for.
-        @return: List of Talent Nodes at the given rank from left to right.
-        """
-
-        # TODO: Convert to DFS?
-
-        # initialize the search from the head node
-        if root is None:
-            root = self.head
-            node_list = []
-
-        # if we are at the rank, add this node to the list
-        if root.rank == rank:
-            return node_list.append(root)
         
-        # if there is a left child, search down the left side
-        if root.child_left:
-            self.__get_talent_node_list_at_rank(rank, root.child_left, node_list)
-        
-        # if there is a right child, search down the right side
-        if root.child_right:
-            self.__get_talent_node_list_at_rank(rank, root.child_right, node_list)
-
-        return node_list
+    def __create_temporary_node(self, node: TalentNode) -> None:
+        """
+        Creates a temporary node to hold the bonds of a Talent Node.
+        @param: node: Node to create a temporary node for.
+        """
+        temp_node = TalentNode(name=None)
+        left_child = node.child_left
+        right_child = node.child_right
+        parent = node.parent
+        # then strip off all the bonds from the talent node
+        self.__dissolve_all_bonds(node, parent, True)
+        # and add all the bonds to the temporary node
+        self.__add_all_bonds(temp_node, parent, left_child, right_child, True)
     
     def __push_subtree_to_lost_talents(self, node: TalentNode) -> None:
         """
@@ -174,40 +165,75 @@ class TTree:
 
         return
 
-    def __shift_talent_nodes_right(self, new_node: TalentNode, root_node: TalentNode) -> None:
+    def __shift_talent_nodes_right(self, new_node: TalentNode, parent_node: TalentNode) -> None:
         """
         Shifts all Talent Nodes to the right starting from the left node.
-        @param: new_node: The new node to this parent we will be adding as the left child
-        @param: root_node: Root node to start the search from.
+        There are 2 cases this function handles:
+        1. The new node is new to this rank and all other nodes need to shift right,
+        until there are no more nodes or no more parents to shift to.
+        2. The new node is shifting from one place at this depth to the left most
+        position at this depth.
+        @param: new_node: The new node to this parent we will be adding as a child.
+        @param: parent_node: The parent to hook it to.
+        @param: child_node_list: List of children to sequentially fold to the shifted nodes.
         """
-        # the new node is already the left child of the root node
-        if root_node.child_left == new_node:
+        # if new node has bonds, we need to raise an exception (it shouldn't)
+        if new_node.parent or new_node.child_left or new_node.child_right:
+            raise Exception("The new node has bonds.")
+        
+        # if there are no more nodes to shift, lose this node
+        if not parent_node:
+            self.__push_subtree_to_lost_talents(new_node)
             return
         
-        # if there is no left child, we can just add the new node and stop shifting
-        if not root_node.child_left:
-            root_node.child_left = new_node
-            new_node.parent = root_node
+        # if this parent is gaining its first child, we can stop
+        if not parent_node.child_left:
+            self.__add_bonds(new_node, parent_node, True)
+            return
+        
+        # if the left child has no name, it means this is a temporary
+        # node added in case 2
+        if not parent_node.child_left.name:
+            temp_node = parent_node.child_left
+            temp_left = temp_node.child_left
+            temp_right = temp_node.child_right
+            self.__dissolve_all_bonds(temp_node, parent_node, True)
+            self.__add_all_bonds(new_node, parent_node, temp_left, temp_right, True)
+            # this is one of the rare times where we delete a node.
+            # design flaw?
+            del temp_node
             return
 
         # pick up the left child and set it to the sent_node
-        sent_node = root_node.child_left
+        sent_node = parent_node.child_left
+        sent_left = sent_node.child_left
+        sent_right = sent_node.child_right
+        self.__dissolve_all_bonds(sent_node, parent_node, True)
         # place the new_node in the left child's old spot
-        root_node.child_left = new_node
-        # pick up the right child and set it to the sent_node
-        temp_node = root_node.child_right
+        self.__add_all_bonds(new_node, parent_node, sent_left, sent_right, True)
+        # pick up the right child to set it to the sent_node
+        shifted_node = parent_node.child_right
+        # if there is no right child, we can stop shifting
+        if not shifted_node:
+            self.__add_bonds(sent_node, parent_node, False)
+            return
+        
+        shifted_left = shifted_node.child_left
+        shifted_right = shifted_node.child_right
+        self.__dissolve_all_bonds(shifted_node, parent_node, False)
         # place the sent_node in the right child's old spot
-        root_node.child_right = sent_node
+        self.__add_all_bonds(sent_node, parent_node, shifted_left, shifted_right, False)
         # set the new_node as the left child of the sent_node
-        sent_node = temp_node
-
-        # now set the parents on the set nodes
-        root_node.child_left.parent = root_node
-        root_node.child_right.parent = root_node
+        sent_node = shifted_node
     
-        # if somewhere along the way we picked up a None node, 
+        # if somewhere along the way we picked up a None node,
+        # or we found the original spot from case 2
         # we should stop shifting
         if not sent_node:
+            return
+        
+        if sent_node.name == None:
+            del sent_node
             return
         
         # if we just needed to swap the left and right nodes, we are done
@@ -215,18 +241,11 @@ class TTree:
             return
 
         # find the parent's sibling...
-        uncle_node = self.__get_right_sibling(root_node)
-        
-        if uncle_node:
-            # ...and recurse
-            return self.__shift_talent_nodes_right(sent_node, uncle_node)
-        else:
-            # we have reached the end of the tree
-            # and must lose this talent and its children
-            self.__push_subtree_to_lost_talents(sent_node)
-        return
+        uncle_node = self.__get_right_sibling(parent_node)
+        # and recurse
+        return self.__shift_talent_nodes_right(sent_node, uncle_node)
     
-    def __shift_talent_nodes_left(self, node_list: list, new_parent_node: TalentNode, list_rank: int, new_child_left: TalentNode=None, new_child_right: TalentNode=None, remaining_nodes: list=[]) -> list:
+    def __shift_talent_nodes_left(self, node_list: list, new_parent_node: TalentNode, list_rank: float, new_child_left: TalentNode=None, new_child_right: TalentNode=None, remaining_nodes: list=[]) -> list:
         """
         Recursively shifts a list of nodes to the left until
         there are no more parents to shift to, then it adds the remaining
@@ -349,7 +368,7 @@ class TTree:
             is_promotion_rank_new = True
 
         # grab a list of all the nodes at the old rank
-        old_ranked_nodes = self.__get_talent_node_list_at_rank(old_rank)
+        old_ranked_nodes = self._get_talent_node_list_at_rank(old_rank)
         # add the promoted node to the first item in the list so we can steal its children
         old_ranked_nodes.insert(0, promoted_node)
         # shift all the other nodes to the left to officially get rid of the promoted node at this rank
@@ -390,7 +409,7 @@ class TTree:
             self.__shift_talent_nodes_right(promoted_node, new_parent)
             return
 
-    def __get_left_most_talent_node_at_rank(self, talent_node: TalentNode, rank: int=None) -> TalentNode:
+    def __get_left_most_talent_node_at_rank(self, talent_node: TalentNode, rank: float=None) -> TalentNode:
         """
         Gets the left most Talent Node at a given rank.
         @param: talent_node: Node to start the search from.
@@ -461,24 +480,44 @@ class TTree:
         node.parent = None
         return
     
-    def __dissolve_all_bonds(self, node: TalentNode, parent: TalentNode, child_left: TalentNode, child_right: TalentNode, is_left: bool) -> None:
+    def __dissolve_all_bonds(self, node: TalentNode, parent: TalentNode, is_left: bool) -> None:
         """
         Dissolves bonds between a Talent Node and its parent and children.
         @param: node: Node to dissolve bonds with.
         @param: parent: Parent to dissolve bonds with.
-        @param: child_left: Left child to dissolve bonds with.
-        @param: child_right: Right child to dissolve bonds with.
         @param: is_left: Boolean to determine if the node is the left child.
         """
         if is_left:
             self.__dissolve_bonds(node, parent, True)
         else:
             self.__dissolve_bonds(node, parent, False)
-        self.__dissolve_bonds(child_left, node, True)
-        self.__dissolve_bonds(child_right, node, False)
+        if node.child_left:
+            self.__dissolve_bonds(node.child_left, node, True)
+        if node.child_right:
+            self.__dissolve_bonds(node.child_right, node, False)
         return
 
     # Internal functions
+    def _get_talent_node_list_at_rank(self, rank: float) -> list:
+        """
+        Gets all Talent Nodes at a given rank using breadth first search.
+        @param: rank: Rank to search for.
+        @return: List of Talent Nodes at the given rank from left to right.
+        """
+        node_list = []
+        queue = [self.head]
+
+        while queue:
+            current_node = queue.pop(0)
+            if current_node.rank == rank:
+                node_list.append(current_node)
+            if current_node.child_left:
+                queue.append(current_node.child_left)
+            if current_node.child_right:
+                queue.append(current_node.child_right)        
+
+        return node_list
+    
     def _count_total_talents(self, root_node: TalentNode, count: int=0) -> int:
         """
         Counts the total number of talents in the T Tree.

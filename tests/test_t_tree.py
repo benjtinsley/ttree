@@ -50,11 +50,23 @@ class TestTTree(unittest.TestCase):
 
     def test_promote_talent_in_balanced_tree(self):
         tree = TTree()
-        final_node = TestHelpers().build_robust_balanced_tree(tree)
+        final_node_name = TestHelpers().build_robust_balanced_tree(tree)
+        self.assertListEqual(tree.lost_talents, [], "There should be no lost talents.")
+        self.assertEqual(tree._count_total_talents(tree.head), 7, "There should be 7 starting talents in the tree.")
         # add one more task to promote the talent
-        tree.add_task("Promotional task", final_node)
-        self.assertEqual(tree._find_talent_node(final_node, tree.head).rank, 1, "The talent should have been promoted to rank 1.")
-        self.assertEqual(tree._count_total_talents(tree.head), tree.total_nodes, "There should be 7 talents in the tree.")
+        tree.add_task("Promotional task", final_node_name)
+        
+        list_at_rank_2 = tree._get_talent_node_list_at_rank(2)
+        list_at_rank_1 = tree._get_talent_node_list_at_rank(1)
+        list_at_rank_0 = tree._get_talent_node_list_at_rank(0)
+
+        self.assertEqual(len(tree.lost_talents), 1, "The promotion should have pushed 1 talent to lost_talents.")
+        self.assertEqual(tree._find_talent_node(final_node_name, tree.head).rank, 1, "The final node should have been promoted to rank 1.")
+        self.assertEqual(list_at_rank_1[0].name, final_node_name, "The first talent at rank 1 should be the promoted node.")
+        self.assertEqual(len(list_at_rank_2), 1, "There should be 1 talent at rank 2.")
+        self.assertEqual(len(list_at_rank_1), 2, "There should be 2 talents at rank 1.")
+        self.assertEqual(len(list_at_rank_0), 3, "There should be 3 talents at rank 0.")
+        self.assertEqual(tree._count_total_talents(tree.head), tree.total_nodes, "There should be 4 remaining talents in the tree.")
 
 if __name__ == '__main__':
     unittest.main()
