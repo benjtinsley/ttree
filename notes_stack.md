@@ -8,7 +8,8 @@
 - [x] set burnout
 
 ## Running things to do
-- [ ] deathod 🪦
+- [ ] time function testing for task node retreival?
+- [x] deathod 🪦
 - [x] build tests for unbalanced with new rank balanced with new rank and unbalanced
 - [x] use __add_bonds and __dissolve_bonds where appropriate, rather than manually doing it
 - [x] get node list by rank as BFS search to rank?

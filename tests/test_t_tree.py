@@ -90,5 +90,31 @@ class TestTTree(unittest.TestCase):
         self.assertEqual(len(list_at_rank_0), 2, "There should be 2 talents at rank 0.")
         self.assertEqual(tree._count_total_talents(tree.head), tree.total_nodes, "There should be 5 remaining talents in the tree.")
 
+    def test_kill_tree(self):
+        tree = TTree()
+        # gather information about the tree before building it
+        init_size = TestHelpers().get_tree_memory_size(tree.head)
+        init_nodes = tree.total_nodes
+
+        TestHelpers().build_robust_balanced_tree(tree)
+        
+        # gather information about the tree after building it
+        built_size = TestHelpers().get_tree_memory_size(tree.head)
+        built_nodes = tree.total_nodes
+        
+        # 😞
+        tree.die()
+
+        # gather information about the tree after killing it
+        end_size = TestHelpers().get_tree_memory_size(tree.head)
+        end_nodes = tree.total_nodes
+
+        self.assertLess(init_size, built_size, "The tree should have taken less memory when it was created than built.")
+        self.assertGreater(built_size, end_size, "The tree should have taken more memory when it was built than after dying.")
+        self.assertLessEqual(end_size, init_size, "The tree should not take more memory after death than when it was created.")
+        self.assertEqual(init_nodes, 0, "The tree should have only the god node after being created.")
+        self.assertEqual(built_nodes, 7, "The tree should have 7 talents after being built.")
+        self.assertEqual(end_nodes, 0, "The tree should have only the god node after dying.")
+
 if __name__ == '__main__':
     unittest.main()

@@ -1,6 +1,7 @@
 import string
 import random
-from structs import TTree, TalentNode
+from sys import getsizeof
+from structs import TTree, TalentNode, TaskNode
 
 class TestHelpers:
     def build_robust_balanced_tree(self, tree) -> str:
@@ -14,6 +15,7 @@ class TestHelpers:
            1   1
          / \    / \\
         0    0 0    0
+        Promoting rank 1 or 0 will push the talent to an existing rank.
         @param tree: the tree to add the talents to
         @return the name of the last talent node added
         """
@@ -42,6 +44,7 @@ class TestHelpers:
            2   2
          / \    / \\
         0    0 0    0
+        Promoting any node will create a new rank in the tree.
         @param tree: the tree to add the talents to
         @return the name of the last talent node added
         """
@@ -88,3 +91,49 @@ class TestHelpers:
         task = f"{num1}{num2}{symbol}{letter}"
         # Add the task to the talent
         tree.add_task(task, talent_name)
+    
+    def get_tree_memory_size(self, node: TalentNode, size: int=0) -> int:
+        """
+        Recursively gets the memory size of the tree.
+        @param node: the node to get the memory size of
+        @param size: the total size of the tree
+        @return the memory size of the tree
+        """
+
+        if node is None:
+            return
+        
+        size += getsizeof(node)
+
+        if node.child_left:
+            if node.child_left.task_head:
+                size += self._get_node_memory_size(node.child_left.task_head)
+            self.get_tree_memory_size(node.child_left, size)
+
+        if node.child_right:
+            if node.child_right.task_head:
+                size += self._get_node_memory_size(node.child_right.task_head)
+            self.get_tree_memory_size(node.child_right, size)
+
+        return size
+
+    
+    # Internal
+    def _get_node_memory_size(self, task: TaskNode, size: int=0) -> int:
+        """
+        Recursively gets the memory size of the node.
+        @param node: the node to get the memory size of
+        @param size: the total size of the node
+        @return the memory size of the node
+        """
+        if not task:
+            return
+        
+        size += getsizeof(task)
+
+        if task.child_left:
+            size += self._get_node_memory_size(task.child_left)
+        if task.child_right:
+            size += self._get_node_memory_size(task.child_right)
+
+        return size

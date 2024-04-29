@@ -82,11 +82,57 @@ class TTree:
         return current_time
     
 
-    def die(self) -> None:
+    def die(self, node=None) -> None:
         """
-        Destroys T Tree.
+        Destroys T Tree, clearing out all talent nodes and lost talents.
+        All tasks flash before your eyes.
+        @param: node: Node to be sent to oblivion.
         """
-        pass
+        # if it wasn't fed a node, start from the head
+        if not node:
+            node = self.head
+        
+        left_child = node.child_left
+        right_child = node.child_right
+
+        # out of respect, we won't delete the nameless, ininite head node
+        if node.name:
+            if node.parent:
+                if node.parent.child_left == node:
+                    self.__dissolve_bonds(node, node.parent, True)
+                else:
+                    self.__dissolve_bonds(node, node.parent, False)
+            if left_child:
+                self.__dissolve_bonds(left_child, node, True)
+                self.die(left_child)
+            if right_child:
+                self.__dissolve_bonds(right_child, node, False)
+                self.die(right_child)
+
+            if node.task_head:
+                print(f"{node.name} is dying. Observe all it knew:")
+                node.review_tasks(node.task_head)
+            else:
+                print(f"{node.name} is dying. It knew nothing.")
+            del node
+
+        else:
+            if left_child:
+                self.die(left_child)
+            if right_child:
+                self.die(right_child)
+
+        # TODO: keep lost talents? do you believe in past lives?
+        while self.lost_talents:
+            lost_talent = self.lost_talents.pop(0)
+            TalentNode.review_tasks(lost_talent.task_head)
+            del lost_talent
+
+        # return to the beginning
+        self.total_nodes = 0
+        self.time = 0
+        
+        return
     
     # Private functions
     def __get_right_sibling(self, left_sibling_node: TalentNode) -> TalentNode:

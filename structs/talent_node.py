@@ -94,6 +94,25 @@ class TalentNode:
         # if the task wasn't found in the recent task map, search the tree
         return self.__recall_task_from_tree(task_head, task_name, current_time)
 
+    def review_tasks(self, task_node):
+        """
+        Recursively deletes all task nodes, but allows one
+        last look at the each one before they are gone forever.
+        @param: task_node: Node to be deleted.
+        """
+
+        if task_node is None:
+            return
+        if task_node.child_left:
+            self.review_tasks(task_node.child_left)
+        if task_node.child_right:
+            self.review_tasks(task_node.child_right)
+        
+        print(task_node.task_name)
+        del task_node
+
+        return
+    
     # Private functions 
     def __recall_task_from_map(self, task_name: str, current_time: int) -> bool:
         """
