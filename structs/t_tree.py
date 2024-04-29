@@ -43,12 +43,13 @@ class TTree:
 
         return
 
-    def access_task(self, task_name: str, talent_name: str) -> None:
+    def access_task(self, task_name: str, talent_name: str) -> bool:
         """
         Accesses a task in the T Tree. The side-effect is shifting 
         this Talent Node to the left-most position at its depth.
         @param: task_name: Name of the task to access.
         @param: talent_name: Name of the talent to access.
+        @return: Boolean indicating if the task was found.
         """
         talent_node = self._find_talent_node(talent_name, self.head)
         # note that we look up the task and update the time here
@@ -57,7 +58,7 @@ class TTree:
         # if the talent node is not found, we can't access the task.
         # this means the talent node was added to lost_talents or was never added!
         if not talent_node:
-            return
+            return False
         
         task_found = talent_node.recall_task(talent_node.task_head, task_name, current_time)
         
@@ -68,9 +69,11 @@ class TTree:
             # then shift the talent node to the left most position at its depth
             left_most_uncle = self.__get_left_most_talent_node_at_rank(self.head, parent_rank)
             self.__shift_talent_nodes_right(talent_node, left_most_uncle)
-            pass
+            return True
+        
+        return False
 
-    def capture_flowing_time(self, is_flowing = True) -> int:
+    def capture_flowing_time(self, is_flowing: bool = True) -> int:
         """
         Gets the current time of the T Tree then increments if time is expected to flow.
         @param: is_flowing: Boolean to determine if time should flow.
@@ -82,11 +85,12 @@ class TTree:
         return current_time
     
 
-    def die(self, node=None) -> None:
+    def die(self, node: TalentNode = None, show_life: bool = False) -> None:
         """
         Destroys T Tree, clearing out all talent nodes and lost talents.
         All tasks flash before your eyes.
         @param: node: Node to be sent to oblivion.
+        @param: show_life: Boolean to determine if the node's tasks should be displayed.
         """
         # if it wasn't fed a node, start from the head
         if not node:
@@ -104,23 +108,25 @@ class TTree:
                     self.__dissolve_bonds(node, node.parent, False)
             if left_child:
                 self.__dissolve_bonds(left_child, node, True)
-                self.die(left_child)
+                self.die(left_child, show_life)
             if right_child:
                 self.__dissolve_bonds(right_child, node, False)
-                self.die(right_child)
+                self.die(right_child, show_life)
 
             if node.task_head:
-                print(f"{node.name} is dying. Observe all it knew:")
-                node.review_tasks(node.task_head)
+                if show_life:
+                    print(f"{node.name} is dying. Observe all it knew:")
+                node.review_tasks(node.task_head, show_life)
             else:
-                print(f"{node.name} is dying. It knew nothing.")
+                if show_life:
+                    print(f"{node.name} is dying. It knew nothing.")
             del node
 
         else:
             if left_child:
-                self.die(left_child)
+                self.die(left_child, show_life)
             if right_child:
-                self.die(right_child)
+                self.die(right_child, show_life)
 
         # TODO: keep lost talents? do you believe in past lives?
         while self.lost_talents:

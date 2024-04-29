@@ -4,6 +4,9 @@ from .helpers import TestHelpers
 
 class TestTalentNode(unittest.TestCase):
     def test_check_talent_node_exists(self):
+        """
+        Tests to see if the talent node exists in the tree.
+        """
         tree = TTree()
         tasks = ["Some long task", "Some short task", "Some medium task", "Workbook", "Explaining it to someone else", "Trying it again"]
         for task in tasks:
@@ -29,8 +32,14 @@ class TestTalentNode(unittest.TestCase):
         node = tree._find_talent_node("TalentA", tree.head)
         other_task_node = node._find_task_node(other_tasks[0], node.task_head)
         self.assertIs(other_task_node.is_burnt, False, "The found talent node should no longer be burnt out when spacing out the tasks added.")    
+        del tree
 
     def test_relearn(self):
+        """
+        Tests to see if the talent node is required to relearn 
+        all the items in the recent task map if it's been too 
+        long since the last task.
+        """
         tree = TTree()
         talents = ["TalentA", "TalentB", "TalentB", "TalentB", "TalentB",  "TalentA"]
         for i in range(len(talents)):
@@ -38,5 +47,9 @@ class TestTalentNode(unittest.TestCase):
             TestHelpers().add_single_task(tree, talent)
         node = tree._find_talent_node("TalentA", tree.head)
         self.assertEqual(node.recent_task_map, {}, "The Talent Node should have an empty recent task map waiting too long between tasks (most recent add time - last add time is >= 2 x the amount of talent nodes).")
+        del tree
+        
+    def test_time_function_retrieval(self):
+        pass
 if __name__ == '__main__':
     unittest.main()

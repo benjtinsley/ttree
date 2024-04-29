@@ -9,6 +9,8 @@ class TestTTree(unittest.TestCase):
         self.assertIsNotNone(tree.head, "The root should not be None after adding a talent.")
         self.assertEqual(tree.head.child_left.name, "TalentA", "The root's name should match the added talent.")
 
+        del tree
+
     def test_add_two_talents(self):
         tree = TTree()
         tree.add_task("Some long task", "TalentB")
@@ -17,6 +19,8 @@ class TestTTree(unittest.TestCase):
         self.assertEqual(tree.head.child_right.name, "TalentB", "The right child's name should be 'TalentB'.")
         self.assertEqual(tree.head.child_left.name, "TalentA", "The left child's name should be 'TalentA'.")
         self.assertEqual(tree._count_total_talents(tree.head), tree.total_nodes, "There should be 2 talents in the tree.")
+
+        del tree
 
     def test_add_three_talents_with_lost_node(self):
         """
@@ -34,6 +38,8 @@ class TestTTree(unittest.TestCase):
         self.assertEqual(tree.lost_talents[0].name, "TalentB", "'TalentB' should have been moved to lost_talents.")
         self.assertEqual(tree._count_total_talents(tree.head), tree.total_nodes, "There should be 2 talents in the tree.")
 
+        del tree
+
     def test_time(self):
         tree = TTree()
         self.assertEqual(tree.time, 0, "The time should be 0 upon initialization.")
@@ -47,6 +53,8 @@ class TestTTree(unittest.TestCase):
         self.assertEqual(tree.time, 4, "The time should be 4 after accessing an existing task.")
         tree.access_task("Some long task", "TalentA")
         self.assertEqual(tree.time, 5, "The time should be 5 after accessing a non-existing task.")
+
+        del tree
 
     def test_promote_talent_in_robust_balanced_tree(self):
         tree = TTree()
@@ -67,6 +75,8 @@ class TestTTree(unittest.TestCase):
         self.assertEqual(len(list_at_rank_1), 2, "There should be 2 talents at rank 1.")
         self.assertEqual(len(list_at_rank_0), 3, "There should be 3 talents at rank 0.")
         self.assertEqual(tree._count_total_talents(tree.head), tree.total_nodes, "There should be 4 remaining talents in the tree.")
+
+        del tree
 
     def test_promote_talent_in_gapped_balanced_tree(self):
         tree = TTree()
@@ -90,6 +100,8 @@ class TestTTree(unittest.TestCase):
         self.assertEqual(len(list_at_rank_0), 2, "There should be 2 talents at rank 0.")
         self.assertEqual(tree._count_total_talents(tree.head), tree.total_nodes, "There should be 5 remaining talents in the tree.")
 
+        del tree
+
     def test_kill_tree(self):
         tree = TTree()
         # gather information about the tree before building it
@@ -104,6 +116,8 @@ class TestTTree(unittest.TestCase):
         
         # 😞
         tree.die()
+        # uncomment to see the tree's tasks flash before your eyes
+        # tree.die(None, True)
 
         # gather information about the tree after killing it
         end_size = TestHelpers().get_tree_memory_size(tree.head)
@@ -115,6 +129,8 @@ class TestTTree(unittest.TestCase):
         self.assertEqual(init_nodes, 0, "The tree should have only the god node after being created.")
         self.assertEqual(built_nodes, 7, "The tree should have 7 talents after being built.")
         self.assertEqual(end_nodes, 0, "The tree should have only the god node after dying.")
+
+        del tree
 
 if __name__ == '__main__':
     unittest.main()
