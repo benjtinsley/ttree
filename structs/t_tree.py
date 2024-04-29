@@ -143,25 +143,30 @@ class TTree:
         if node is None:
             return
         
-        # dissolve the bonds that once held this node to the tree
+        # gather bonds to dissolve that once held this node to the tree
         old_parent = node.parent
-        node.parent = None
+        old_left = node.child_left
+        old_right = node.child_right
 
+        # the bonds may have already been dissolved, so it's good to check
         if old_parent:
-            # if the node is still the left or right child of the parent, make it official
             if old_parent.child_left == node:
-                old_parent.child_left = None
-            if old_parent.child_right == node:
-                old_parent.child_right = None
+                self.__dissolve_bonds(node, old_parent, True)
+            else:
+                self.__dissolve_bonds(node, old_parent, False)
 
-        # push the node to the lost talents
+        if old_left:
+            self.__dissolve_bonds(old_left, node, True)
+            self.__push_subtree_to_lost_talents(old_left)
+        if old_right:
+            self.__dissolve_bonds(old_right, node, False)
+            self.__push_subtree_to_lost_talents(old_right)
+
+        # this node is officially all alone
+        # push it to the lost talents
         self.lost_talents.append(node)
         # we lost a good one
         self.total_nodes -= 1
-
-        # recurse
-        self.__push_subtree_to_lost_talents(node.child_left)
-        self.__push_subtree_to_lost_talents(node.child_right)
 
         return
 
@@ -258,8 +263,12 @@ class TTree:
         @param: remaining_nodes: List of nodes that stay at the current rank
         @return: List of remaining nodes that stay at the current rank
         """
-        # if there are no more nodes to shift, return the remaining nodes
+        # there are no more nodes to shift
         if not node_list:
+            # move the leftover children to the lost_talents array
+            self.__push_subtree_to_lost_talents(new_child_left)
+            self.__push_subtree_to_lost_talents(new_child_right)
+            # return the remaining nodes
             return remaining_nodes
         
         node = node_list.pop(0)
@@ -276,8 +285,6 @@ class TTree:
             self.__push_subtree_to_lost_talents(new_child_left)
             self.__push_subtree_to_lost_talents(new_child_right)
             next_parent = None
-            next_child_right = None
-            next_child_left = None
 
         # we add the promoted node to the old node list initially
         # so we can just use its children and go ahead and break
@@ -285,33 +292,35 @@ class TTree:
         # we can tell its the promoted node because it's rank is different
         # than the rest of the list
         elif node.rank != list_rank:
-            self.__dissolve_bonds(node, new_parent_node, True)
-            if new_child_left:
-                self.__dissolve_bonds(new_child_left, node, True)
-            if new_child_right:
-                self.__dissolve_bonds(new_child_right, node, False)
+            self.__dissolve_all_bonds(node, new_parent_node, True)
+            # if next_child_left:
+            #     self.__dissolve_bonds(next_child_left, node, True)
+            # if next_child_right:
+            #     self.__dissolve_bonds(next_child_right, node, False)
+            # we will keep the parent the same for the next node
             next_parent = new_parent_node
         # otherwise we need to place the node somewhere as the parent's children
         else:
             # if it's already the right child of the parent, we need to move it to the left
             # conversely, if the parent doesn't have a left child, we can just add it there
-            if new_parent_node.right_child == node or not new_parent_node.child_left:
+            if new_parent_node.child_right == node or not new_parent_node.child_left:
                 # first, make sure there's no other record of this node with the parent
                 if new_parent_node.child_right == node:
-                    self.__dissolve_bonds(node, new_parent_node, False)
+                    self.__dissolve_all_bonds(node, new_parent_node, False)
                 # then, add the node to the left child of the parent
                 self.__add_all_bonds(node, new_parent_node, new_child_left, new_child_right, True)
                 # we will keep the parent the same
                 next_parent = new_parent_node
             else:
-                self.__add_all_bonds(node, new_parent_node, new_child_left, new_child_right, True)
+                # add this node to the right child spot
+                self.__add_all_bonds(node, new_parent_node, new_child_left, new_child_right, False)
                 # we will get the right sibling of the parent
                 next_parent = self.__get_right_sibling(new_parent_node)
             # finally add this node to the remaining nodes list
             remaining_nodes.append(node)
 
         # recurse
-        return self.__shift_talent_nodes_left(node_list, next_parent, next_child_left, next_child_right)
+        return self.__shift_talent_nodes_left(node_list, next_parent, list_rank, next_child_left, next_child_right, remaining_nodes)
 
 
     def __update_time(self) -> None:
@@ -386,18 +395,16 @@ class TTree:
                 new_left_child = remaining_nodes.pop(0)
             else:
                 new_left_child = None
+            
             if len(remaining_nodes) > 0:
                 new_right_child = remaining_nodes.pop(0)
             else:
                 new_right_child = None
 
             self.__add_all_bonds(promoted_node, new_parent, new_left_child, new_right_child, True)
-
             # the rest of the nodes need to be pushed to the lost_talents array
             for node in remaining_nodes:
                 self.__push_subtree_to_lost_talents(node)
-
-            return
         
         # if the node is being inserted at a rank that already exists, we will potentially
         # move nodes to the lost_talent array at these levels:
@@ -407,7 +414,8 @@ class TTree:
         # - old rank
         else:
             self.__shift_talent_nodes_right(promoted_node, new_parent)
-            return
+        
+        return
 
     def __get_left_most_talent_node_at_rank(self, talent_node: TalentNode, rank: float=None) -> TalentNode:
         """

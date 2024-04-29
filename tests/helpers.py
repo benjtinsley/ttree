@@ -5,7 +5,7 @@ from structs import TTree, TalentNode
 class TestHelpers:
     def build_robust_balanced_tree(self, tree) -> str:
         """
-        Builds a tree with 8 talents, each non-infinite, non-leaf node with 2 children.
+        Builds a tree with 7 countable, each non-infinite, non-leaf node with 2 children.
         The ranks are as follows:
              ∞
               /
@@ -30,6 +30,30 @@ class TestHelpers:
         self.add_single_task(tree, 'Talent4')
         self.add_single_task(tree, 'Talent4')
         return 'Talent4'
+    
+    def build_gapped_balanced_tree(self, tree) -> str:
+        """
+        Builds a tree with 7 countable talents, each non-infinite, non-leaf node with 2 children.
+        The ranks are as follows:
+             ∞
+              /
+             4
+            /  \\
+           2   2
+         / \    / \\
+        0    0 0    0
+        @param tree: the tree to add the talents to
+        @return the name of the last talent node added
+        """
+        self.promote_talent_node(tree, 'Talent1', 4)
+        self.promote_talent_node(tree, 'Talent3', 2)
+        self.promote_talent_node(tree, 'Talent2', 2)
+        # Add these with a single task to add them at rank 0
+        self.add_single_task(tree, 'Talent7')
+        self.add_single_task(tree, 'Talent6')
+        self.add_single_task(tree, 'Talent5')
+        self.add_single_task(tree, 'Talent4')
+        return 'Talent2'
 
     def promote_talent_node(self, tree: TTree, talent_name: str, rank_delta: int) -> None:
         """
@@ -45,7 +69,6 @@ class TestHelpers:
 
         while ending_rank != talent_node.rank:
             self.add_single_task(tree, talent_node.name)
-
         return 
 
     def add_single_task(self, tree: TTree, talent_name: str) -> TalentNode:
