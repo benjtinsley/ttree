@@ -29,7 +29,7 @@ The T Tree data structure aims to blend human cognitive behaviors with data mana
 The __T Tree__ is comprised of 2 data structures: __Talent Nodes__ and __Task Nodes__, both of which are structured into binary trees, but with different properties.
 
 #### T Tree
-Every Talent Node is initialized with the following properties. Type denoted in parenthesis:
+A singular T Tree is initialized with the following properties. Type denoted in parenthesis:
 - __head__: Pointer to an uncountable and unknown head with no name and rank of infinity, from which all Talent Nodes come (_Talent Node_)
 - __time__: The current time of the T Tree (_integer_)
 - __total_nodes__: The total Talent Nodes in the T Tree (_integer_)
@@ -64,7 +64,7 @@ Every Talent Node is initialized with the following properties. Type denoted in 
 The T Tree only has two front end actions, __add_task()__ and __access_task()__. The steps of which are defined:
 
 #### add_task(task_name: _string_=required, talent_name: _string_=optional) -> _void_
-1. Using pre-order recursive search, the tree fetches the Talent Node associated with `talent_name` given.
+1. Using in-order recursive search, the tree fetches the Talent Node associated with `talent_name` given.
     - If no talent node is found, a new talent node with rank 0 is created, and the number of total nodes is incremented.
 1. The current time of the tree is incremented.
 1. The talent node is then shifted to the left most position at its rank, denoting it has been accessed the most recently.
