@@ -25,7 +25,7 @@ class TTree:
 
         # grab the starting rank of the talent node for comparison later
         starting_rank = talent_node.rank
-        current_time = self.capture_flowing_time()
+        current_time = self._capture_flowing_time()
         talent_node.store_task(talent_node, task_name, current_time, self.total_nodes)
         parent_rank = talent_node.parent.rank if talent_node.parent else None
 
@@ -54,7 +54,7 @@ class TTree:
         talent_node = self._find_talent_node(talent_name, self.head)
         # note that we look up the task and update the time here
         # this means if this task is not found, it burns time for us
-        current_time = self.capture_flowing_time()
+        current_time = self._capture_flowing_time()
         # if the talent node is not found, we can't access the task.
         # this means the talent node was added to lost_talents or was never added!
         if not talent_node:
@@ -72,18 +72,6 @@ class TTree:
             return True
         
         return False
-
-    def capture_flowing_time(self, is_flowing: bool = True) -> int:
-        """
-        Gets the current time of the T Tree then increments if time is expected to flow.
-        @param: is_flowing: Boolean to determine if time should flow.
-        @return: Current time.
-        """
-        current_time = self.time
-        if is_flowing:
-            self.__update_time() 
-        return current_time
-    
 
     def die(self, node: TalentNode = None, show_life: bool = False) -> None:
         """
@@ -558,6 +546,17 @@ class TTree:
         return
 
     # Internal functions
+    def _capture_flowing_time(self, is_flowing: bool = True) -> int:
+        """
+        Gets the current time of the T Tree then increments if time is expected to flow.
+        @param: is_flowing: Boolean to determine if time should flow.
+        @return: Current time.
+        """
+        current_time = self.time
+        if is_flowing:
+            self.__update_time() 
+        return current_time
+
     def _get_talent_node_list_at_rank(self, rank: float) -> list:
         """
         Gets all Talent Nodes at a given rank using breadth first search.
@@ -601,7 +600,7 @@ class TTree:
 
     def _find_talent_node(self, talent_name: str, root_node: TalentNode) -> TalentNode:
         """
-        Finds a Talent Node in the T Tree.
+        Finds a Talent Node in the T Tree using pre-order search to prioritize left-most nodes.
         @param: talent_name: Name of the Talent Node to find.
         @param: root_node: Root node to start the search from.
         @return: Talent Node if found, None otherwise.
@@ -610,12 +609,14 @@ class TTree:
         if not root_node:
             return None
         
-        # Search the tree in-order, favoring where we are and then the left side
+        # Search down the left side first
+        left_result = self._find_talent_node(talent_name, root_node.child_left)
+        
+        # If we found the node, return it           
         if root_node.name == talent_name:
             return root_node
         
-        # Recursively search the left and right subtrees
-        left_result = self._find_talent_node(talent_name, root_node.child_left)
+        # Now search down the right side
         right_result = self._find_talent_node(talent_name, root_node.child_right)
 
         # Return the result of the search
