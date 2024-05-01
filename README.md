@@ -113,6 +113,8 @@ It begins at the Head Node of the T Tree, and recursively searches for each of t
 If `show_life` is set to True, each Talent Node Name and task name will be printed into the console before it is deleted.
 
 ## Example
+(Recommended to read this at [README.md](/README.md) with the file explorer turned off (command/control + B).
+
 Let's show an example of adding tasks to a Talent Node to update its rank. Given the tree below, we can see the Talent Nodes D, E, F & G at the bottom at rank 0, Talent Nodes B and C above them at rank 2, above them is rank 4 Talent Node A, and at the top is a nameless Talent Node at rank infinity. The purpose of it is to ensure more than 1 node can be added to the tree, by offering a left and right position for the first 2 nodes. It's mysterious that it has to work like this.
 ```ascii
 
