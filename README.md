@@ -337,7 +337,7 @@ Beautiful. Now the fun starts. Let's add one more task to Talent Node C:
 ```
 A few checks are made here:
 1. We see that the Max Tasks now equals the total amount of tasks in the Recent Task Map
-1. We check the Burnout Limit, which is 2. This means that when looping through all the nodes in the Recent Task Map, the difference between key of one task and the key of the next task in the list must be at least the Burnout Limit at least once in the list. Unfortunately for us, all these tasks were added in sequential order, so the greatest difference between any two nodes in order is 1.
+1. We check the Burnout Limit, which is 2. This means that when looping through all the nodes in the Recent Task Map, the difference between the key of one task and the key of the next task in the list must be at least the Burnout Limit at least once in the list. Unfortunately for us, all these tasks were added in sequential order, so the greatest difference between any two nodes in order is 1.
 
 Therefore, this Talent Node is burnt out. We need to now convert these tasks to Task Nodes, but since this node is burnt out, they will be added in a non-efficient manner. There are already Task Nodes in this Talent Node, because it is at rank 2, meaning the Recent Task Map has been converted to Task Nodes twice already. All the tasks in this Recent Task Map will be added to the right most position in the tree, relative to the Task Head. They will be saved along with their creation time and time they were last accessed as well as a flag marking this specific Task Node was added when the Talent Node was burnt out. For the purpose of space, we will only show the task name in the tree:
 
