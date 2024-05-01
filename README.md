@@ -141,10 +141,10 @@ Now, we want to add 4 tasks to Talent Node C, which is currently at rank 2:
 
 ```ascii
 ┌──────────────────────┐
-│add_task('1', 'C')    │          Talent Nodes
-│add_task('2', 'C')    │
-│add_task('3', 'C')    │             ┏━━━┓
-│add_task('4', 'C')    │             ┃   ┃
+│add_task('0', 'C')    │          Talent Nodes
+│add_task('1', 'C')    │
+│add_task('2', 'C')    │             ┏━━━┓
+│add_task('3', 'C')    │             ┃   ┃
 └──────────────────────┘            ┌┻━━━┛
                                     │
                                     │
@@ -164,7 +164,7 @@ When adding the first task, it recursively searches the tree for Talent Node "C"
 
 ```ascii
 ┌──────────────────────┐
-│add_task('1', 'C')    │─ ─ ─ ┐   Talent Nodes
+│add_task('0', 'C')    │─ ─ ─ ┐   Talent Nodes
 └──────────────────────┘
                               └ ─ ─ ▶┏━━━┓
                                      ┃   ┃
@@ -188,7 +188,7 @@ When adding the first task, it recursively searches the tree for Talent Node "C"
 We will update the time:
 ```ascii
 ┌──────────────────────┐
-│add_task('1', 'C')    │          Talent Nodes
+│add_task('0', 'C')    │          Talent Nodes
 └──────────────────────┘
                                      ┏━━━┓
 ┌──────────────────────────┐         ┃   ┃
@@ -210,7 +210,7 @@ We will update the time:
 We unhook it from its current bonds:
 ```ascii
 ┌──────────────────────┐
-│add_task('1', 'C')    │          Talent Nodes
+│add_task('0', 'C')    │          Talent Nodes
 └──────────────────────┘
                                      ┏━━━┓
                                      ┃   ┃
@@ -231,7 +231,7 @@ We unhook it from its current bonds:
 ...and move it to the left-most position at this rank, shifting any other nodes to the right:
 ```ascii
 ┌──────────────────────┐
-│add_task('1', 'C')    │          Talent Nodes
+│add_task('0', 'C')    │          Talent Nodes
 └──────────────────────┘
                                      ┏━━━┓
                                      ┃   ┃
@@ -253,11 +253,11 @@ Now we look into the Recent Task Map of Talent C and add it with the current tim
 
 ```ascii
 ┌──────────────────────┐
-│add_task('1', 'C')    │          Talent Nodes
+│add_task('0', 'C')    │          Talent Nodes
 └──────────────────────┘                                 ┌──────────────────────────────┐
                                      ┏━━━┓               │       Recent Task Map        │▓
                                      ┃   ┃               │                              │▓
-                                    ┌┻━━━┛               │          {42: '1'}           │▓
+                                    ┌┻━━━┛               │          {42: '0'}           │▓
                                     │                ┌ ▶ │                              │▓
                                     │             ┌ ─    │                              │▓
                                   ┏━┻━┓        ┌ ─       │         Max Tasks: 5         │▓
@@ -275,11 +275,11 @@ Now when we add the next task, the tree doesn't have to be traversed as thorough
 
 ```ascii
 ┌──────────────────────┐
-│add_task('1', 'C')▤   │          Talent Nodes
-│add_task('2', 'C')    │─ ─ ─ ┐                          ┌──────────────────────────────┐
+│add_task('0', 'C')▤   │          Talent Nodes
+│add_task('1', 'C')    │─ ─ ─ ┐                          ┌──────────────────────────────┐
 └──────────────────────┘       ─ ─ ─▶┏━━━┓               │       Recent Task Map        │▓
                                      ┃   ┃               │                              │▓
-                                    ┌┻━━━┛               │      {42: '1', 43: '2'}      │▓
+                                    ┌┻━━━┛               │      {42: '0', 43: '1'}      │▓
                                    ─│                ┌ ▶ │                              │▓
                                   │ │             ┌ ─    │                              │▓
                                   ▼━┻━┓        ┌ ─       │         Max Tasks: 5         │▓
@@ -296,12 +296,12 @@ Now when we add the next task, the tree doesn't have to be traversed as thorough
 Now, let's show how it would look with all the specified tasks added to Talent Node C:
 ```ascii
 ┌──────────────────────┐
-│add_task('1', 'C')▤   │          Talent Nodes
-│add_task('2', 'C')▤   │                                 ┌──────────────────────────────┐
-│add_task('3', 'C')▤   │─ ─ ─ ─ ─ ─ ▶┏━━━┓               │       Recent Task Map        │▓
-│add_task('4', 'C')▤   │             ┃   ┃               │                              │▓
-└──────────────────────┘            ┌┻━━━┛               │ {42: '1', 43: '2', 44: '3',  │▓
-                                   ─│                ┌ ▶ │           45: '4'}           │▓
+│add_task('0', 'C')▤   │          Talent Nodes
+│add_task('1', 'C')▤   │                                 ┌──────────────────────────────┐
+│add_task('2', 'C')▤   │─ ─ ─ ─ ─ ─ ▶┏━━━┓               │       Recent Task Map        │▓
+│add_task('3', 'C')▤   │             ┃   ┃               │                              │▓
+└──────────────────────┘            ┌┻━━━┛               │ {42: '0', 43: '1', 44: '2',  │▓
+                                   ─│                ┌ ▶ │           45: '3'}           │▓
                                   │ │             ┌ ─    │                              │▓
                                   ▼━┻━┓        ┌ ─       │                              │▓
                            ┌ ─ ─ ─┃ A ┃     ┌ ─          │         Max Tasks: 5         │▓
@@ -317,12 +317,12 @@ Now, let's show how it would look with all the specified tasks added to Talent N
 Beautiful. Now the fun starts. Let's add one more task to Talent Node C:
 ```ascii
 ┌──────────────────────┐
-│add_task('5', 'C')    │─ ─ ─ ┐   Talent Nodes
+│add_task('4', 'C')    │─ ─ ─ ┐   Talent Nodes
 └──────────────────────┘                                 ┌──────────────────────────────┐
                               └ ─ ─ ▶┏━━━┓               │       Recent Task Map        │▓
                                      ┃   ┃               │                              │▓
-                                    ┌┻━━━┛               │ {42: '1', 43: '2', 44: '3',  │▓
-                                   ─│                ┌ ▶ │      45: '4', 46: '5'}       │▓
+                                    ┌┻━━━┛               │ {42: '0', 43: '1', 44: '2',  │▓
+                                   ─│                ┌ ▶ │      45: '3', 46: '4'}       │▓
                                   │ │             ┌ ─    │ ──┐                          │▓
                                   ▼━┻━┓        ┌ ─       │   └──┐                    │  │▓
                            ┌ ─ ─ ─┃ A ┃     ┌ ─          │      └▶ Max Tasks: 5    ┌─┘  │▓
@@ -362,27 +362,27 @@ Therefore, this Talent Node is burnt out. We need to now convert these tasks to 
 ┗━━━┛      ┗━━━┛ ┗━━━┛       ┗━━━┛         ───────────────────────────────┐
                                                                           │
                                                                         ┏━┻━┓
-                                                                        ┃'1'┃
+                                                                        ┃'0'┃
                                                                         ┗━━┳┛
                                                                            └─┐
                                                                              │
                                                                            ┏━━━┓
-                                                                           ┃'2'┃
+                                                                           ┃'1'┃
                                                                            ┗━━┳┛
                                                                               └─┐
                                                                                 │
                                                                               ┏━━━┓
-                                                                              ┃'3'┃
+                                                                              ┃'2'┃
                                                                               ┗━━┳┛
                                                                                  └─┐
                                                                                    │
                                                                                  ┏━━━┓
-                                                                                 ┃'4'┃
+                                                                                 ┃'3'┃
                                                                                  ┗━━┳┛
                                                                                     └─┐
                                                                                       │
                                                                                     ┏━━━┓
-                                                                                    ┃'5'┃
+                                                                                    ┃'4'┃
                                                                                     ┗━━━┛
 ```
 
