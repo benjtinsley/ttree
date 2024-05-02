@@ -89,7 +89,7 @@ The T Tree only has two front end actions, __add_task()__ and __access_task()__.
 
 
 #### access_task(task_name: _string_=optional, talent_name: _string_=optional) -> _boolean_
-1. Using pre-order recursive search, the tree fetches the Talent Node associated with `talent_name` given.
+1. Using in-order recursive search, the tree fetches the Talent Node associated with `talent_name` given.
 1. The current time of the tree is incremented.
     - If no Talent Node of the given node was found (perhaps this Talent Node was placed in the Lost Talents list?) the function __returns false__.
 1. The task is sought out in the Talent Node. First, the Recent Task Map is searched for the `task_name`.
@@ -99,9 +99,7 @@ The T Tree only has two front end actions, __add_task()__ and __access_task()__.
     - If a Task Node exists with the matching `task_name`, it updates the Last Access Time on the matching Task Node.
 1. The Task Node tree is then converted to a max heap by the Last Access Time, only for the Task Nodes where Is Burnt is set to false. The Task Nodes where Is Burnt is set to true are put at the end of the heap. Finally, it __returns true__.
 
-
 There is a third and lesser used action, `die()` which allows all Talent Nodes and Task Nodes to be removed from memory.
-
 
 #### die(node: _TalentNode_, show_life: _boolean_=optional) -> void
 It begins at the Head Node of the T Tree, and recursively searches for each of the Talent Node children, doing the following:
@@ -354,11 +352,11 @@ Therefore, this Talent Node is burnt out. We need to now convert these tasks to 
                ┃ A ┃       ─ ─                     ╱              ╲
              ┌─┻━━━┻┐ ┌ ─ ┘                       ╱                ╲
              │     ─│─                           ╱                  ╲
-      ┏━━━┳──┘┌ ─ ┘ └──┳━━━┓                    ╱ ┌─────────────────┐╲
-      ┃"C"┃─ ─         ┃ B ┃                   ╱  │                 │ ╲
-    ┌─┻━━━┻┐         ┌─┻━━━┻─┐                ╱   │ (Balanced Tree) │  ╲
-┏━━━┫      ┣━━━┓ ┏━━━┫       ┣━━━┓           ╱    │                 │   ╲
-┃ D ┃      ┃ E ┃ ┃ F ┃       ┃ G ┃          ╱     └─────────────────┘    ╲
+      ┏━━━┳──┘┌ ─ ┘ └──┳━━━┓                    ╱                    ╲
+      ┃"C"┃─ ─         ┃ B ┃                   ╱                      ╲
+    ┌─┻━━━┻┐         ┌─┻━━━┻─┐                ╱     (Balanced Tree)    ╲
+┏━━━┫      ┣━━━┓ ┏━━━┫       ┣━━━┓           ╱                          ╲
+┃ D ┃      ┃ E ┃ ┃ F ┃       ┃ G ┃          ╱                            ╲
 ┗━━━┛      ┗━━━┛ ┗━━━┛       ┗━━━┛         ───────────────────────────────┐
                                                                           │
                                                                         ┏━┻━┓
@@ -464,7 +462,7 @@ Therefore, the final tree structure, with ranks will be as follows:
 
 ## Tests
 
-This repo uses pytest. You can view the tests in the /test directory. To run the test suite, simply run 
+This repo uses pytest. You can view the tests in the /test directory. To run the test suite, point to the root directory and run:
 
 ```bash
 pip install -r requirements.txt # installs rich and colorama for better test formatting
@@ -515,7 +513,7 @@ The week after the BTrees, we studied ADTs, which was interesting to me. It felt
 
 These had my gears grinding in the background for some time as I continued the course. By the time the final project was announced, I had already gotten quite far in my mind on the third ADT. Perhaps it can increment but cannot decrement? Which structure would best be suited for this? Graph? Hash Table? Binary Tree? What if there were more than one dimension to the denote the proficiency? I kept a running log of my thoughts on my dry erase board and it continued to haunt me. It felt like it was writing itself and all I had to do was put my attention to it for a little longer and it would reveal something else to me. The rules were all already there, I just had to write them down.
 
-I would define myself as a jack-of-all-trades type person. Mastery, for whatever reason, is very difficult for me, and I often change gears before going deeper. It seemed that every time I thought about this emerging data structure, it revealed something to me about myself and how I view my own talents. Promoting talents, which in the real world is spending more time doing something is an opportunity cost. By spending time with one thing, it cuts you off from spending time with something else. Perhaps the reason why mastery was difficult for me is there are things I don't want to get rid of. Perhaps there are things I don't want to lose. It's easier to lose something flighty and temporal than lose something large amounts of time have been invested in, so I opt for the former because I'm afraid of losing the latter. As the John Lennon quote at the beginning states, perhaps I mire in the plans and schemes because I think I haven't found the Thing<sup>TM</sup> that will promote itself to the top yet.
+I would define myself as a jack-of-all-trades type person. Mastery, for whatever reason, is very difficult for me, and I often change gears before going deeper. It seemed that every time I thought about this emerging data structure, it revealed something to me about myself and how I view my own talents. Promoting talents, which in the real world means spending more time doing one specific thing, is an opportunity cost. By spending time with one thing, it cuts you off from spending time with something else. Perhaps the reason why mastery was difficult for me is there are things I don't want to get rid of. Perhaps there are things I don't want to lose. It's easier to lose something flighty and temporal than lose something large amounts of time have been invested in, so I opt for the former because I'm afraid of losing the latter. As the John Lennon quote at the beginning states, perhaps I mire in the plans and schemes because I think I haven't found the Thing<sup>TM</sup> that will promote itself to the top yet.
 
 This class focused on efficient getting, setting, deleting and editing of information. This is an important thing to learn, but I also believe that efficiency shouldn't always be the goal in life. Efficiency is selfish and ruthless. It bypasses all other desires to accomplish the goal in as little time as possible. Optimum, on the other hand, takes many things into account to accomplish in a wholistic approach. After all, if I were to ask you to consider the most efficient workday as you could imagine and the most optimal workday you could imagine, I think the former would have you feeling frazzled and burnt out, while the latter would leave you feeling accomplished and satisfied.
 
@@ -531,6 +529,6 @@ and
 - Would it make sense for the God Node aka the Talent Node head to be infinitely scalable so that there's no limit to the amount of initial Talents one can add, but once one gets promoted, all but 3 are lost? Converseley, if possible, having a way for someone to multiple maxed out Talents at the top.
 - Should Talent Nodes in the Lost Talent list be preserved after tree death? The God Node is, so should they be as well? Although inaccessible, would it imply some sort of reincarnation or past life?
 - Mastery, which was never touched on, should bypass burnout and the relearn scenario, or at least minimize the effects of both.
-- As humans, we like to orient ourselves in pyramid shaped structures, with less people at the top than the bottom. However, after working through this, I've found that promotion in this structure shape is highly inefficient at best and ruthless at worst. Someone can be promoted to a level that someone else already has, but it may create a harder communication pattern for the person on top to all the other people, or it may thrust someone out, or it will give someone "nothing to do" ie, no child nodes. Or it will create a bottleneck and the organization will potentially have to lose many divisions to accomodate. Is there a more optimal structure for humans to arrange ourselves in to ensure a more efficient flow of power, communication and responsibility?
+- As humans, we like to orient ourselves in pyramid shaped structures, with less people at the top than the bottom. However, after working through this, I've found that promotion in this structure shape is highly inefficient at best and ruthless at worst. It's really, really, really hard to promote, and this was by far, the most challenging aspect of this project. There are so many levels of organizational concerns to consider when promoting. Someone can be promoted to a level that someone else already has, which may create a harder communication pattern for the person on top to all the other members, or it may thrust someone out, or it could give someone "nothing to do" ie, no child nodes. Or it will create a bottleneck and the organization will potentially have to lose many divisions to accomodate. Is there a more optimal structure for humans to arrange ourselves in to ensure a more efficient flow of power, communication and responsibility? It's definitely not the pyramid shaped structures, even for those at the top.
 - Should there be a randomized `final_time` on the T Tree that forces `die()` when the current time reaches it?
 - Check out [/notes_stack.md](/notes_stack.md) to view more stream of consciousness thoughts and unrealized desires for this project.
