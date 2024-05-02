@@ -43,7 +43,7 @@ Every Talent Node is initialized with the following properties. Type denoted in 
 - __parent__: Pointer to the parent (_Talent Node_)
 - __child_left__: Pointer to the left child (_Talent Node_)
 - __child_right__: Pointer to the right child (_Talent Node_)
-- __recent_task_map__: Key value mapping of recent tasks added to this talent as the time it was added and name of task (_integer__, __string_)
+- __recent_task_map__: Key value mapping of recent tasks added to this talent as the time it was added and name of task (_integer_, _string_)
 - __max_tasks__: Number of tasks that can be added to the recent_task_map before they are all converted to Task Nodes (_integer_)
 - __task_head__: Pointer to the head of the Task Nodes (_Task Node_)
 - __burnout_limit__: The minimum number of steps in time between successive tasks in the Recent Task Map that must occur once to determine if Burnout should be set (_integer_)
@@ -506,12 +506,12 @@ A question started to bother me - could there be a problem that attracted me bas
 
 But still, the idea of data structures seemed powerful to me. It was a way to create a universe of rules in which amazing things were possible.
 
-The week after the BTrees, we studied ADTs, which was interesting to me. It felt like a recap of everything we had studied up to that point, but set it all under an umbrella. We didn't have to worry about how it worked, just that it behaved in a way that was expected. During the lectures, my mind started to wander and I scribbled down some "Custom ADTs", as I defined them:
-- ADT of ADTs where the inner ADT is known only when looked at via timestamp for entry/exit from queue - as a way to track emotions.
-- ADT of population features that reveal outcomes due to feature contraints, as in, a way to predict wars or cultural phenomena.
-- ADT of attributes that automatically increment if accessed or decrement if unaccessed - for traits/growth.
 
-These had my gears grinding in the background for some time as I continued the course. By the time the final project was announced, I had already gotten quite far in my mind on the third ADT. Perhaps it can increment but cannot decrement? Which structure would best be suited for this? Graph? Hash Table? Binary Tree? What if there were more than one dimension to the denote the proficiency? I kept a running log of my thoughts on my dry erase board and it continued to haunt me. It felt like it was writing itself and all I had to do was put my attention to it for a little longer and it would reveal something else to me. The rules were all already there, I just had to write them down.
+The week after the BTrees, we studied ADTs, which was interesting to me. It felt like a recap of everything we had studied up to that point, but set it all under an umbrella. We didn't have to worry about how it worked, just that it behaved in a way that was expected. During the lectures, my mind started to wander and I scribbled down some "Custom ADTs", as I defined them.
+
+<img align="left" alt="Custom ADTs: 1. ADT of ADTs where the inner ADT is known only when looked at via timestamp for entry/exit from queue - as a way to track emotions. 2. ADT of attributes that automatically increment if accessed or decrement if unaccessed - for traits/growth. 3. ADT of population features that reveal outcomes due to feature contraints, as in, a way to predict wars or cultural phenomena." src="./static/custom-adt.JPG" width="350"/>
+
+These had my gears grinding in the background for some time as I continued the course. By the time the final project was announced, I had already gotten quite far in my mind on one that I had originally defined as incrementing or decrementing the ranks depending on access frequency, sort of like a Splay Tree, but with the explicit intent of tracking growth in traits. Perhaps it can increment but cannot decrement? Which structure would best be suited for this? Graph? Hash Table? Binary Tree? What if there were more than one dimension to the denote the proficiency? I kept a running log of my thoughts on my dry erase board and it continued to haunt me. It felt like it was writing itself and all I had to do was put my attention to it for a little longer and it would reveal something else to me. The rules were all already there, I just had to write them down.
 
 I would define myself as a jack-of-all-trades type person. Mastery, for whatever reason, is very difficult for me, and I often change gears before going deeper. It seemed that every time I thought about this emerging data structure, it revealed something to me about myself and how I view my own talents. Promoting talents, which in the real world means spending more time doing one specific thing, is an opportunity cost. By spending time with one thing, it cuts you off from spending time with something else. Perhaps the reason why mastery was difficult for me is there are things I don't want to get rid of. Perhaps there are things I don't want to lose. It's easier to lose something flighty and temporal than lose something large amounts of time have been invested in, so I opt for the former because I'm afraid of losing the latter. As the John Lennon quote at the beginning states, perhaps I mire in the plans and schemes because I think I haven't found the Thing<sup>TM</sup> that will promote itself to the top yet.
 
