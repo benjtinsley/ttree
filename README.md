@@ -38,7 +38,7 @@ A singular T Tree is initialized with the following properties. Type denoted in 
 #### Talent Nodes
 Every Talent Node is initialized with the following properties. Type denoted in parenthesis:
 - __name__: The name of the talent (_string_)
-- __rank__: The current rank. The higher the rank, the closer the node is to the head. Initial value = 0 (_integer_)
+- __rank__: The current rank. The higher the rank, the closer the node is to the head. Talent Node Head initial value = ∞ All other Talent Node initial value = 0 (_integer_)
 - __last_access__: The time value in which the last access to this node happened (_integer_)
 - __parent__: Pointer to the parent (_Talent Node_)
 - __child_left__: Pointer to the left child (_Talent Node_)
