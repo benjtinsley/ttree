@@ -463,7 +463,7 @@ Therefore, the final tree structure, with ranks will be as follows:
 
 ## Tests
 
-This repo uses pytest. You can view the tests in the /test directory. To run the test suite, point to the root directory and run:
+This repo uses pytest. You can view the tests in the [/tests](https://github.com/benjtinsley/ttree/tree/main/tests) directory. To run the test suite, point to the root directory and run:
 
 ```bash
 pip install -r requirements.txt # installs rich and colorama for better test formatting
@@ -527,7 +527,7 @@ and
 - It reflects the T-shaped skills, which is a necessary constraint of this data structure: very few Talents can have the depth of the highest ranked one, but many Talents can spread out horizontally underneath it.
 
 ## Weird Thoughts and Places My Brain Went
-- Would it make sense for the God Node aka the Talent Node head to be infinitely scalable so that there's no limit to the amount of initial Talents one can add, but once one gets promoted, all but 3 are lost? Converseley, if possible, having a way for someone to multiple maxed out Talents at the top.
+- Would it make sense for the God Node aka the Talent Node head to be infinitely scalable so that there's no limit to the amount of initial Talents one can add, but once one gets promoted, all but 3 are lost? Conversely, if possible, having a way for someone to multiple maxed out Talents at the top.
 - Should Talent Nodes in the Lost Talent list be preserved after tree death? The God Node is, so should they be as well? Although inaccessible, would it imply some sort of reincarnation or past life?
 - Mastery, which was never touched on, should bypass burnout and the relearn scenario, or at least minimize the effects of both.
 - As humans, we like to orient ourselves in pyramid shaped structures, with less people at the top than the bottom. However, after working through this, I've found that promotion in this structure shape is highly inefficient at best and ruthless at worst. It's really, really, really hard to promote, and this was by far, the most challenging aspect of this project. There are so many levels of organizational concerns to consider when promoting. Someone can be promoted to a level that someone else already has, which may create a harder communication pattern for the person on top to all the other members, or it may thrust someone out, or it could give someone "nothing to do" ie, no child nodes. Or it will create a bottleneck and the organization will potentially have to lose many divisions to accomodate. Is there a more optimal structure for humans to arrange ourselves in to ensure a more efficient flow of power, communication and responsibility? It's definitely not the pyramid shaped structures, even for those at the top.
